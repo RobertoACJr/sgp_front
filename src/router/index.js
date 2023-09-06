@@ -1,20 +1,20 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import LoginView from '@/views/LoginView.vue'
+import ListEvents from '@/modules/events/ListEvents.vue'
+import Login from '@/modules/login/Login.vue'
 
 const routes = [
   {
     path: '/login',
     name: 'login',
-    component: LoginView,
+    component: Login,
     meta: {
       needsAuthentication: false
     }
   },
   {
     path: '/',
-    name: 'home',
-    component: HomeView,
+    name: 'eventsList',
+    component: ListEvents,
     meta: {
       needsAuthentication: true
     }
