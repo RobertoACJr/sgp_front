@@ -8,6 +8,7 @@
       >
         <CardEvent
           :event-title="event.title"
+          @click="goToEvent(event)"
         />
       </v-col>
     </v-row>
@@ -16,10 +17,14 @@
 
 <script>
 import { defineComponent } from 'vue';
+import { mapMutations } from 'vuex';
 import CardEvent from '@/modules/events/components/CardEvent.vue';
 
 export default defineComponent({
   name: 'ListEvents',
+  components: {
+    CardEvent,
+  },
   data: () => ({
     events: [
       { title: 'primeiro evento' },
@@ -29,8 +34,14 @@ export default defineComponent({
       { title: 'quinto evento' },
     ],
   }),
-  components: {
-    CardEvent,
+  methods: {
+    ...mapMutations('events', [
+      'currentEvent',
+    ]),
+    goToEvent(event) {
+      this.currentEvent(event);
+      this.$router.push({ name: 'showEvent' });
+    },
   },
 });
 </script>

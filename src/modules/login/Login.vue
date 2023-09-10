@@ -36,7 +36,7 @@
       <v-btn
         block
         class="mb-8"
-        color="blue"
+        color="primary"
         size="large"
         variant="tonal"
       >

@@ -1,6 +1,6 @@
 <template>
   <v-card
-    class="card-event-container"
+    class="card-project-container"
     elevation="4"
     rounded="lg"
     @click="emitClick"
@@ -8,19 +8,19 @@
     <v-img
       :src="require('@/assets/WallpaperIFMS.png')"
       alt=""
-      class="card-event-container__image"
+      class="card-project-container__image"
     />
-    <div class="card-event-container__title">
-      {{ eventTitle }}
+    <div class="card-project-container__title">
+      {{ projectTitle }}
     </div>
   </v-card>
 </template>
 
 <script>
 export default {
-  name: 'CardEvent',
+  name: 'CardProject',
   props: {
-    eventTitle: {
+    projectTitle: {
       type: String,
       default: '',
     },
@@ -37,7 +37,7 @@ export default {
 </script>
 
 <style lang="scss" scope>
-.card-event-container {
+.card-project-container {
   display: flex;
   gap: 16px;
   flex-direction: column;
