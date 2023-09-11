@@ -8,8 +8,8 @@ const _axios = axios.create();
 
 _axios.interceptors.request.use(
   function (config) {
-    const auth = window.$vue.$store.getters["getToken"]
-      ? `Bearer ${window.$vue.$store.getters["getToken"]}`
+    const auth = window.$vue.$store.getters["auth/getToken"]
+      ? `Bearer ${window.$vue.$store.getters["auth/getToken"]}`
       : '';
     if (auth) config.headers.common['Authorization'] = auth;
     return config;
@@ -21,12 +21,12 @@ _axios.interceptors.request.use(
 
 _axios.interceptors.response.use(
   function (response) {
-    window.$vue.$store.commit("setToken", response?.data?.data?.authorization?.token || '');
+    window.$vue.$store.commit("auth/setToken", response?.data?.data?.authorization?.token || '');
     return response;
   },
   function (error) {
     if (error?.response?.status == 403) {
-      window.$vue.$store.commit("resetAuth");
+      window.$vue.$store.commit("auth/reset");
       window.$vue.$router.push({ name: "login" });
     }
     return Promise.reject(error);

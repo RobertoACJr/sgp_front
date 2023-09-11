@@ -20,7 +20,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['isSigned'])
+    ...mapActions("auth", ["isSigned"])
   },
 }
 </script>

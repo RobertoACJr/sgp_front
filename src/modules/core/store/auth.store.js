@@ -4,6 +4,7 @@ const defaultState = () => ({
 })
 
 export default {
+  namespaced: true,
   state: defaultState(),
   getters: {
     getToken: state => state.token,
@@ -11,7 +12,7 @@ export default {
     getUserUuid: state => state?.user?.uuid,
   },
   mutations: {
-    resetAuth (state) {
+    reset (state) {
       Object.keys(state).forEach(k => state[k] = defaultState()[k]);
     },
     setToken (state, token) {
