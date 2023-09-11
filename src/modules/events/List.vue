@@ -1,23 +1,35 @@
 <template>
   <v-container>
-    <v-row>
+    <loading
+      v-if="loading"
+    />
+    <v-row
+      v-else-if="events.length"
+    >
       <v-col
         v-for="(event, key) in events"
         :key="key"
         md="4"
       >
         <CardEvent
-          :event-title="event.title"
+          :event-title="event.text"
           @click="goToEvent(event)"
         />
       </v-col>
     </v-row>
+    <div
+      v-else
+      class="no-content"
+    >
+      Nenhum Evento Encontrado
+    </div>
   </v-container>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
-import { mapMutations } from 'vuex';
+import { mapGetters } from 'vuex';
+import * as eventsService from '@/modules/events/services/events.service.js';
 import CardEvent from '@/modules/events/components/CardEvent.vue';
 
 export default defineComponent({
@@ -26,22 +38,45 @@ export default defineComponent({
     CardEvent,
   },
   data: () => ({
-    events: [
-      { title: 'primeiro evento' },
-      { title: 'segundo evento' },
-      { title: 'terceiro evento' },
-      { title: 'quarto evento' },
-      { title: 'quinto evento' },
-    ],
+    loading: true,
+    events: [],
   }),
+  computed: {
+    ...mapGetters([
+      'getUserUuid',
+    ])
+  },
+  mounted() {
+    this.getEvents();
+  },
   methods: {
-    ...mapMutations('events', [
-      'currentEvent',
-    ]),
-    goToEvent(event) {
+    getEvents() {
+      eventsService.list({ userUuid: this.getUserUuid })
+        .then(data => {
+          this.events = data;
+        })
+        .catch(() => {
+          // TODO
+          // algum tratamento
+        })
+        .finally(() => {
+          this.loading = false;
+        })
+    },
+    goToEvent (event) {
       this.currentEvent(event);
       this.$router.push({ name: 'showEvent' });
     },
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.no-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
