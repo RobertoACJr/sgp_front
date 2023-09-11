@@ -25,7 +25,7 @@
         :type="showPassword ? 'text' : 'password'"
         :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
         :error-messages="getPasswordErrors"
-        @click:append="showPassword = !showPassword"
+        @click="showPassword = !showPassword"
       />
 
       <!-- <v-card
