@@ -12,7 +12,6 @@ _axios.interceptors.request.use(
       ? `Bearer ${window.$vue.$store.getters["getToken"]}`
       : '';
     if (auth) config.headers.common['Authorization'] = auth;
-    debugger;
     return config;
   },
   function(error) {
