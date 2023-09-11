@@ -1,14 +1,14 @@
 export default {
   state: {
-    permitions: {
-      events: ["list", "show", "create", "update"],
-      projects: ["list", "show", "rate"],
-    }
+    permitions: {}
   },
   getters: {
     getPermitions: state => state.permitions,
   },
   mutations: {
+    setPermitions(state, permitions) {
+      state.permitions = permitions;
+    },
   },
   actions: {
     verifyPermition({ getters }, to) {

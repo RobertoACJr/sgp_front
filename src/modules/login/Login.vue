@@ -1,3 +1,4 @@
+
 <template>
   <v-container class="login-container">
     <v-card
@@ -6,19 +7,25 @@
       width="448"
       rounded="lg"
     >
+      <p
+        v-if="message"
+        class="text-center"
+      >
+        {{ message }}
+      </p>
+
       <v-text-field
-        v-model="email"
+        v-model="state.email"
         label="E-mail"
-        hide-details=""
+        :error-messages="getEmailErrors"
       />
 
       <v-text-field
-        v-model="password"
-        :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-        :type="showPassword ? 'text' : 'password'"
+        v-model="state.password"
         label="Senha"
-        hint="Pelo menos 8 caracteres"
-        counter
+        :type="showPassword ? 'text' : 'password'"
+        :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        :error-messages="getPasswordErrors"
         @click:append="showPassword = !showPassword"
       />
 
@@ -39,6 +46,7 @@
         color="primary"
         size="large"
         variant="tonal"
+        @click="login"
       >
         Log In
       </v-btn>
@@ -55,25 +63,84 @@
         </a>
       </v-card-text> -->
     </v-card>
+    <loading
+      v-if="loading"
+    />
   </v-container>
 </template>
 
 <script>
-import { required } from '@vuelidate/validators'
+import useVuelidate from '@vuelidate/core';
+import * as authService from '@/modules/core/services/auth.service.js';
+
+import { reactive } from 'vue';
+import { required, email, minLength } from '@vuelidate/validators';
 
 export default {
   name: 'LoginView',
-  data: () => ({
-    showPassword: false,
-    email: '',
-    password: '',
-  }),
-  validations () {
-    return {
-      email: { required },
-      password: { required }
+  setup () {
+    const state = reactive({
+      email: '',
+      password: '',
+    })
+    const rules = {
+      email: { required, email },
+      password: { required, min: minLength(6) },
     }
-  }
+
+    const v$ = useVuelidate(rules, state)
+
+    return { state, v$ }
+  },
+  data: () => ({
+    requiredMessage: "O campo é obrigatório",
+    minMessage: "O campo deve ter no mínimo 8 caracteres",
+    emailMessage: "O E-mail inserido é inválido",
+    message: "",
+    loading: false,
+    showPassword: false,
+  }),
+
+  computed: {
+    getEmailErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.email.required.$invalid && errors.push(this.requiredMessage);
+      this.v$.email.email.$invalid && errors.push(this.emailMessage);
+      return errors;
+    },
+    getPasswordErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.password.required.$invalid && errors.push(this.requiredMessage);
+      this.v$.password.min.$invalid && errors.push(this.minMessage);
+      return errors;
+    },
+  },
+
+  methods: {
+    login() {
+      this.message = "";
+      this.loading = true;
+      this.v$.$touch()
+      if (this.v$.$invalid) return;
+
+      authService.login({
+        email: this.state.email,
+        password: this.state.password,
+      })
+        .then(() => {
+          this.$router.push({ name: 'listEvents' });
+        })
+        .catch(error => {
+          this.message = error.response?.data?.message ||
+            "Erro ao processar Solicitação, tente novamente";
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+  },
 }
 </script>
 

@@ -8,8 +8,6 @@ export default [
     component: ListEvents,
     meta: {
       needsAuthentication: true,
-      mainModule: "events",
-      permition: "list",
     }
   },
   {

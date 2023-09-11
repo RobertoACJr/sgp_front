@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import eventsRouter from '@/modules/events/router'
 import projectsRouter from '@/modules/projects/router'
 import Login from '@/modules/login/Login.vue'
@@ -17,11 +17,15 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes
 })
 
 router.beforeEach(async (to, from, next) => {
+  if (to.meta.needsAuthentication) {
+    const isSigned = await window.$vue.$store.dispatch('isSigned')
+    if (!isSigned) next({ name: 'login' });
+  }
   if (await window.$vue.$store.dispatch('verifyPermition', to.name)) {
     next();
   } else {
