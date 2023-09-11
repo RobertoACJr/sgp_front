@@ -28,7 +28,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 import * as eventsService from '@/modules/events/services/events.service.js';
 import CardEvent from '@/modules/events/components/CardEvent.vue';
 
@@ -42,17 +42,18 @@ export default defineComponent({
     events: [],
   }),
   computed: {
-    ...mapGetters([
-      'getUserUuid',
+    ...mapGetters("auth", [
+      "getUserUuid",
     ])
   },
   mounted() {
     this.getEvents();
   },
   methods: {
+    ...mapMutations("events", ["setCurrentEvent"]),
     getEvents() {
       eventsService.list({ userUuid: this.getUserUuid })
-        .then(data => {
+        .then(({ data }) => {
           this.events = data;
         })
         .catch(() => {

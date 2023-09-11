@@ -120,9 +120,9 @@ export default {
   methods: {
     login() {
       this.message = "";
-      this.loading = true;
       this.v$.$touch()
       if (this.v$.$invalid) return;
+      this.loading = true;
 
       authService.login({
         email: this.state.email,
