@@ -74,6 +74,7 @@ import * as authService from '@/modules/core/services/auth.service.js';
 
 import { reactive } from 'vue';
 import { required, email, minLength } from '@vuelidate/validators';
+import { mapMutations } from 'vuex';
 
 export default {
   name: 'LoginView',
@@ -118,6 +119,9 @@ export default {
   },
 
   methods: {
+    ...mapMutations("auth", [
+      "setToken",
+    ]),
     login() {
       this.message = "";
       this.v$.$touch()
@@ -128,7 +132,8 @@ export default {
         email: this.state.email,
         password: this.state.password,
       })
-        .then(() => {
+        .then(({ data }) => {
+          this.setToken(data?.authorization?.token || '');
           this.$router.push({ name: 'listEvents' });
         })
         .catch(error => {
