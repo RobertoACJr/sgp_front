@@ -65,7 +65,7 @@ export default defineComponent({
         })
     },
     goToEvent (event) {
-      this.currentEvent(event);
+      this.setCurrentEvent(event);
       this.$router.push({ name: 'showEvent' });
     },
   },

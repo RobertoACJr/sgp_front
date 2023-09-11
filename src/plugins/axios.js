@@ -21,7 +21,6 @@ _axios.interceptors.request.use(
 
 _axios.interceptors.response.use(
   function (response) {
-    window.$vue.$store.commit("auth/setToken", response?.data?.data?.authorization?.token || '');
     return response;
   },
   function (error) {

@@ -6,7 +6,7 @@ export default {
     getProjects: state => state.projects,
   },
   mutations: {
-    setProjects({ state }, event) {
+    setProjects(state, event) {
       state.projects = event;
     }
   },

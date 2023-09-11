@@ -36,10 +36,10 @@ export default defineComponent({
   }),
   methods: {
     ...mapMutations('events', [
-      'currentEvent',
+      'setCurrentEvent',
     ]),
     goToEvent(event) {
-      this.currentEvent(event);
+      this.setCurrentEvent(event);
       this.$router.push({ name: 'showProject' });
     },
   },

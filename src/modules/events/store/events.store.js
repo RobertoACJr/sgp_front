@@ -7,7 +7,7 @@ export default {
     getCurrentEvent: state => state.currentEvent,
   },
   mutations: {
-    setCurrentEvent({ state }, event) {
+    setCurrentEvent(state, event) {
       state.currentEvent = event;
     }
   },
