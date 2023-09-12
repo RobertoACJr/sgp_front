@@ -16,8 +16,6 @@ export default [
     component: ShowEvent,
     meta: {
       needsAuthentication: true,
-      mainModule: "events",
-      permition: "show",
     }
   }
 ]
