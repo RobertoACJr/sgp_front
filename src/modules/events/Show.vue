@@ -61,7 +61,6 @@ export default defineComponent({
         event_uuid: this.getCurrentEvent.value,
       })
         .then(({ data }) => {
-          debugger
           this.setPermitions(data);
         })
         .catch(() => {
