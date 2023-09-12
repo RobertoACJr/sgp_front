@@ -6,6 +6,12 @@ docker-compose run --rm app sh
 # tu run the project
 docker-compose up app
 
+== configurando .env ==
+
+para o primeiro acesso, copie o .env.example e mude: 
+  -- VUE_APP_URL_API = http://localhost:80/api/
+  -- VUE_APP_ENV = development
+
 == PRIMEIRO ACESSO ==
 
 PARA A PRIMEIRA EXECUÇÃO É NECESSÁRIO RODAR O COMANDO `npm i`, porém dentro do bash container do sgp_front.
