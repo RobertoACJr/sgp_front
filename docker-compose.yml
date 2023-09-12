@@ -5,7 +5,7 @@ services:
     build: .
     container_name: sgp_front
     ports:
-      - '8080:8080'
+      - '16900:16900'
     volumes:
       - ./:/app
     command: 'npm run serve' # for NPM manager

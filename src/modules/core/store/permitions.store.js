@@ -13,9 +13,12 @@ export default {
   },
   actions: {
     verifyPermition({ getters }, to) {
-      return to.meta?.permition
-        ? Boolean(getters.getPermitions[to.meta.mainModule].includes(to.meta.permition))
-        : true;
+      if (to.meta?.permition) {
+        return Boolean(Object.keys(getters.getPermitions?.length)) &&
+          getters.getPermitions[to.meta.mainModule] &&
+          Boolean(getters.getPermitions[to.meta.mainModule].includes(to.meta.permition))
+      }
+      return true;
     },
   },
 }

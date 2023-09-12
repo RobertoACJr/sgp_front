@@ -1,5 +1,6 @@
 import ListProjects from "@/modules/projects/List.vue"
 import ShowProject from "@/modules/projects/Show.vue"
+import RateProject from "@/modules/projects/Rate.vue"
 
 export default [
   {
@@ -9,7 +10,7 @@ export default [
     meta: {
       needsAuthentication: true,
       mainModule: "projects",
-      permition: "list",
+      // permition: "list",
     }
   },
   {
@@ -19,7 +20,17 @@ export default [
     meta: {
       needsAuthentication: true,
       mainModule: "projects",
-      permition: "view",
+      // permition: "view",
+    }
+  },
+  {
+    path: "/projects/rate",
+    name: "rateProject",
+    component: RateProject,
+    meta: {
+      needsAuthentication: true,
+      mainModule: "projects",
+      // permition: "rate",
     }
   }
 ]

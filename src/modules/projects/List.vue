@@ -2,13 +2,13 @@
   <v-container>
     <v-row>
       <v-col
-        v-for="(event, key) in events"
+        v-for="(event, key) in projects"
         :key="key"
         md="4"
       >
-        <CardEvent
+        <CardProject
           :event-title="event.title"
-          @click="goToEvent(event)"
+          @click="goToProject(event)"
         />
       </v-col>
     </v-row>
@@ -18,28 +18,28 @@
 <script>
 import { defineComponent } from 'vue';
 import { mapMutations } from 'vuex';
-import CardEvent from '@/modules/events/components/CardEvent.vue';
+import CardProject from '@/modules/projects/components/CardProject.vue';
 
 export default defineComponent({
-  name: 'ListEvents',
+  name: 'ListProjects',
   components: {
-    CardEvent,
+    CardProject,
   },
   data: () => ({
-    events: [
-      { title: 'primeiro evento' },
-      { title: 'segundo evento' },
-      { title: 'terceiro evento' },
-      { title: 'quarto evento' },
-      { title: 'quinto evento' },
+    projects: [
+      { title: 'primeiro prtojeto' },
+      { title: 'segundo prtojeto' },
+      { title: 'terceiro prtojeto' },
+      { title: 'quarto prtojeto' },
+      { title: 'quinto prtojeto' },
     ],
   }),
   methods: {
-    ...mapMutations('events', [
-      'setCurrentEvent',
+    ...mapMutations('projects', [
+      'setCurrentProject',
     ]),
-    goToEvent(event) {
-      this.setCurrentEvent(event);
+    goToProject(event) {
+      this.setCurrentProject(event);
       this.$router.push({ name: 'showProject' });
     },
   },
