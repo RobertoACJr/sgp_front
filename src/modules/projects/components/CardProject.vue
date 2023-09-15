@@ -1,18 +1,21 @@
 <template>
   <v-card
-    class="card-project-container"
     elevation="4"
     rounded="lg"
+    color="primary"
+    variant="text"
     @click="emitClick"
   >
     <v-img
       :src="require('@/assets/WallpaperIFMS.png')"
-      alt=""
-      class="card-project-container__image"
-    />
-    <div class="card-project-container__title">
-      {{ projectTitle }}
-    </div>
+      class="align-end"
+      height="200px"
+      cover
+    >
+      <v-card-title
+        v-text="projectTitle"
+      />
+    </v-img>
   </v-card>
 </template>
 

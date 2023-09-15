@@ -1,18 +1,21 @@
 <template>
   <v-card
-    class="card-event-container"
     elevation="4"
     rounded="lg"
+    color="primary"
+    variant="text"
     @click="emitClick"
   >
     <v-img
       :src="require('@/assets/WallpaperIFMS.png')"
-      alt=""
-      class="card-event-container__image"
-    />
-    <div class="card-event-container__title">
-      {{ eventTitle }}
-    </div>
+      class="align-end"
+      height="200px"
+      cover
+    >
+      <v-card-title
+        v-text="eventTitle"
+      />
+    </v-img>
   </v-card>
 </template>
 
@@ -37,9 +40,5 @@ export default {
 </script>
 
 <style lang="scss" scope>
-.card-event-container {
-  display: flex;
-  gap: 16px;
-  flex-direction: column;
-}
+
 </style>

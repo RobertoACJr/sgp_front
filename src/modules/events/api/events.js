@@ -4,6 +4,6 @@ export const list = async (params) => {
   return axios.get('event', { params })
 }
 
-export const getEventPermitions = async (payload) => {
+export const getEventPermissions = async (payload) => {
   return axios.post('event/savePermissions', payload)
 }
