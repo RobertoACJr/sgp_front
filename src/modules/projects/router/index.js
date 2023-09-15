@@ -10,7 +10,8 @@ export default [
     meta: {
       needsAuthentication: true,
       mainModule: "projects",
-      // permition: "list",
+      hasNavBar: true,
+      hasPreviousView: 'showEvent',
     }
   },
   {
@@ -20,7 +21,8 @@ export default [
     meta: {
       needsAuthentication: true,
       mainModule: "projects",
-      // permition: "view",
+      hasNavBar: true,
+      hasPreviousView: 'listProjects',
     }
   },
   {
@@ -30,7 +32,8 @@ export default [
     meta: {
       needsAuthentication: true,
       mainModule: "projects",
-      // permition: "rate",
+      hasNavBar: true,
+      hasPreviousView: 'showProject',
     }
   }
 ]
