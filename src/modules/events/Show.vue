@@ -49,19 +49,21 @@ export default defineComponent({
     ]),
   },
   mounted() {
-    this.getEventPermitions();
+    this.getEventPermissions();
   },
   methods: {
-    ...mapMutations("permitions", [
-      "setPermitions"
+    ...mapMutations("permissions", [
+      "setPermissions",
+      "setRole"
     ]),
 
-    getEventPermitions() {
-      eventsService.getEventPermitions({
+    getEventPermissions() {
+      eventsService.getEventPermissions({
         event_uuid: this.getCurrentEvent.value,
       })
         .then(({ data }) => {
-          this.setPermitions(data);
+          this.setPermissions(data.permissions);
+          this.setRole(data.role);
         })
         .catch(() => {
           // TODO

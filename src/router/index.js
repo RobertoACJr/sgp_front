@@ -22,14 +22,13 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  if (to.meta.needsAuthentication) {
-    const isSigned = await window.$vue.$store.dispatch('auth/isSigned')
-    if (!isSigned) next({ name: 'login' });
-  }
-  if (await window.$vue.$store.dispatch('permitions/verifyPermition', to)) {
-    next();
+  const isSigned = await window.$vue.$store.dispatch('auth/isSigned')
+  if (isSigned || to.name == 'login') {
+    if (await window.$vue.$store.dispatch('permissions/verifyPermission', to)) {
+      window.$vue.$store.dispatch('setNavBarConfig', to);
+      next();
+    }
   } else {
-    // TODO lançar toast de aviso
     next({ name: 'login' });
   }
 })

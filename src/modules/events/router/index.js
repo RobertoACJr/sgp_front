@@ -8,6 +8,7 @@ export default [
     component: ListEvents,
     meta: {
       needsAuthentication: true,
+      hasNavBar: true,
     }
   },
   {
@@ -16,6 +17,8 @@ export default [
     component: ShowEvent,
     meta: {
       needsAuthentication: true,
+      hasNavBar: true,
+      hasPreviousView: 'listEvents',
     }
   }
 ]

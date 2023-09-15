@@ -24,6 +24,6 @@ export default {
   position: absolute;
   top: 0;
   right: 0;
-  background-color: #575c5636
+  background-color: rgb(var(--v-theme-light_gray))
 }
 </style>

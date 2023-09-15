@@ -1,5 +1,10 @@
 <template>
   <v-container>
+    <div
+      class="text-h3 heading-3 mb-5"
+    >
+      Lista de Eventos
+    </div>
     <loading
       v-if="loading"
     />

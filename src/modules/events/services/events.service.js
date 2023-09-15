@@ -10,9 +10,9 @@ export const list = async params => {
   }
 }
 
-export const getEventPermitions = async params => {
+export const getEventPermissions = async params => {
   try {
-    const { data } = await eventsApi.getEventPermitions(params);
+    const { data } = await eventsApi.getEventPermissions(params);
     return data;
   } catch (error) {
     console.error(error);
