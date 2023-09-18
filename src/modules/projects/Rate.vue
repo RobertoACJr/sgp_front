@@ -1,9 +1,12 @@
 <template>
-  <v-container>
+  <loading
+    v-if="loading"
+  />
+  <v-container v-else>
     <div
-      class="text-h3 heading-3 mb-5"
+      class="text-h6 heading-6 mb-5"
     >
-      {{ getCurrentProject.name }}
+      {{ getCurrentProject.title }}
     </div>
     <v-form
       v-model="isFormValid"
@@ -13,11 +16,13 @@
         <v-col
           v-for="(criterion, i) in criteria"
           :key="i"
+          cols="12"
           xl="6"
           md="12"
+          sm="12"
         >
           <div
-            class="text-h5 heading-5 mb-3"
+            class="text-body-2 mb-3"
           >
             {{ criterion.title }}
           </div>
@@ -25,7 +30,10 @@
             <v-col
               v-for="(evaluation, j) in criterion.sub_criteria"
               :key="j"
+              cols="12"
+              xl="4"
               md="6"
+              sm="6"
             >
               {{ evaluation.question }}{{ evaluation.required ? " *" : "" }}
               <v-text-field
@@ -37,16 +45,21 @@
                 persistent-hint
                 outline
                 :rules="[
-                  v => evaluation.required && !v ? 'O campo é obrigatório' : true,
-                  v => v > 10 ? 'A nota não pode ser maior que 10' : true,
-                  v => v < 0 ? 'A nota não pode ser menor que 0' : true,
+                  () => evaluation.required && !evaluation.score ? 'O campo é obrigatório' : true,
+                  () => evaluation.score > 10 ? 'A nota não pode ser maior que 10' : true,
+                  () => evaluation.score < 0 ? 'A nota não pode ser menor que 0' : true,
                 ]"
                 @update:model-value="(d) => evaluation.score = `${d}`.replace(',', '.')"
               />
             </v-col>
           </v-row>
         </v-col>
-        <v-col :md="12">
+      </v-row>
+      <v-row>
+        <v-col
+          md="12"
+          sm="12"
+        >
           <v-btn
             type="submit"
             block
@@ -61,61 +74,99 @@
       </v-row>
     </v-form>
   </v-container>
+  <ModalValidateProjectCode
+    :is-open="isModalVerifyCodeOpen"
+    :project-code="getCurrentProject.code"
+    invalid-code-msg="O código inserido está incorreto"
+    title="Código de validação"
+    text="Peça a um dos alunos o código para completar a avaliação"
+    :handle-code-validation="rateProject"
+    @close="() => isModalVerifyCodeOpen = false"
+  />
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
+
+import ModalValidateProjectCode from "@/modules/projects/components/ModalValidateProjectCode.vue";
+
+import * as projectService from "@/modules/projects/services/projects.service";
+
 export default {
   name: 'RateProject',
+  components: {
+    ModalValidateProjectCode,
+  },
   data: () => ({
     requiredMessage: "O campo é obrigatório",
+    isModalVerifyCodeOpen: false,
     isFormValid: false,
     loading: false,
-    criteria: [
-      {
-        title: 'projeto',
-        sub_criteria: [
-          {
-            id: 1,
-            question: 'O projeto é um projeto?',
-            required: true,
-
-            score: null,
-          }
-        ]
-      },
-      {
-        title: 'em caminho de paka...',
-        sub_criteria: [
-          {
-            id: 2,
-            question: 'o tatu caminha dentro?',
-            required: true,
-
-            score: null,
-          },
-          {
-            question: 'se o caminho é..sim',
-            id: 3,
-            required: true,
-
-          },
-        ]
-      },
-    ],
+    criteria: [],
   }),
 
   computed: {
     ...mapGetters('projects', [
       'getCurrentProject',
-    ])
+    ]),
+  },
+
+  mounted() {
+    this.startEvaluation();
   },
 
   methods: {
+    ...mapMutations('projects', ['reset']),
+    ...mapActions(['setToastConfig']),
     sendForm() {
-      debugger;
       if (!this.isFormValid) return;
-      debugger;
+      this.isModalVerifyCodeOpen = true;
+    },
+    getMapEvaluations() {
+      const evaluations = [];
+      this.criteria.forEach(c => {
+        c.sub_criteria.forEach(sc =>
+          (sc.required || sc.score) && evaluations.push({
+            sub_criterion_id: sc.id,
+            score: sc.score,
+          }))
+      })
+      return evaluations;
+    },
+    startEvaluation() {
+      this.loading = true;
+      projectService.startEvaluation({
+        project_code: this.getCurrentProject.code,
+        project_uuid: this.getCurrentProject.uuid,
+      }).then(({ data }) => {
+        this.criteria = data
+        this.loading = false;
+      }).catch(error => {
+        console.error(error);
+        this.$router.push({ name: 'showProject' });
+        return false;
+      })
+    },
+    rateProject(code) {
+      this.loading = true;
+      this.isModalVerifyCodeOpen = false;
+      return projectService.rate({
+        validationCode: code,
+        project_uuid: this.getCurrentProject.uuid,
+        evaluations: this.getMapEvaluations(),
+      }).then(async (response) => {
+        this.reset();
+        await this.$router.push({ name: 'listProjects' });
+        this.setToastConfig({
+          title: response?.message || "Avaliação salva com sucesso!!",
+        });
+        return true;
+      }).catch(error => {
+        console.error(error);
+        return false;
+      }).finally(() => {
+        this.loading = false;
+      })
     },
   },
 }

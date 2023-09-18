@@ -1,16 +1,36 @@
 <template>
   <v-container>
     <div
-      class="text-h3 heading-3 mb-5"
+      class="d-flex justify-space-between"
     >
-      Lista de Projetos
+      <div
+        class="text-h6 heading-6 mb-5"
+      >
+        Lista de Projetos
+      </div>
+      <v-btn
+        v-if="getIsAdmin && !loading"
+        icon
+        title="Recarregar Listagem"
+        @click="getProjectsByPage(1)"
+      >
+        <v-icon
+          color="primary"
+        >
+          mdi-sync
+        </v-icon>
+      </v-btn>
     </div>
     <loading v-if="loading" />
     <v-row v-else-if="getIsAdmin">
-      <v-col :md="12">
+      <v-col
+        md="12"
+        sm="12"
+      >
         <v-table
+          v-if="getProjects.length"
           fixed-header
-          height="500px"
+          height="70vh"
         >
           <thead>
             <tr>
@@ -20,32 +40,49 @@
               <th class="text-left">
                 Nome do Projeto
               </th>
-              <th class="text-left">
+              <th class="text-center">
                 Quantidade de Avaliações
               </th>
-              <th class="text-left">
+              <th class="text-center">
                 Média
               </th>
             </tr>
           </thead>
           <tbody>
             <tr
-              v-for="(project, index) in projects"
+              v-for="(project, index) in getProjects"
               :key="index"
               @click="goToProject(project)"
             >
-              <td>{{ project.code }}</td>
-              <td>{{ project.name }}</td>
-              <td>{{ project.qtd_evaluations || "não avaliado" }}</td>
-              <td>{{ project.average || "não avaliado" }}</td>
+              <td class="text-body-2">
+                {{ project.code }}
+              </td>
+              <td class="text-body-2">
+                {{ project.title }}
+              </td>
+              <td class="text-body-2 text-center">
+                {{ project.evaluations_quantity || "não avaliado" }}
+              </td>
+              <td class="text-body-2 text-center">
+                {{ project.average || "não avaliado" }}
+              </td>
             </tr>
           </tbody>
         </v-table>
+        <div
+          v-else
+          class="mb-5"
+        >
+          Nenhum Projeto Encontrado
+        </div>
       </v-col>
-      <v-col :md="12">
+      <v-col
+        v-if="getLenghtOfPages > 1"
+        md="12"
+      >
         <v-pagination
-          :value="currentPage"
-          :length="lenghtOfPages"
+          v-model="currentPage"
+          :length="getLenghtOfPages"
           rounded="circle"
           @update:model-value="getProjectsByPage"
         />
@@ -53,12 +90,12 @@
     </v-row>
     <v-row v-else>
       <v-col
-        v-for="(project, key) in projects"
+        v-for="(project, key) in getProjects"
         :key="key"
         md="4"
       >
         <CardProject
-          :project-title="project.name"
+          :project-title="project.title"
           @click="goToProject(project)"
         />
       </v-col>
@@ -69,7 +106,10 @@
 <script>
 import { defineComponent } from 'vue';
 import { mapGetters, mapMutations } from 'vuex';
+
 import CardProject from '@/modules/projects/components/CardProject.vue';
+
+import * as projectService from '@/modules/projects/services/projects.service';
 
 export default defineComponent({
   name: 'ListProjects',
@@ -78,43 +118,54 @@ export default defineComponent({
   },
   data: () => ({
     loading: false,
-    projects: [
-      { code: 'abs', qtd_evaluations: 2, name: 'primeiro projeto', average: 5.5 },
-      { code: 'abs', qtd_evaluations: 2, name: 'segundo projeto', average: 3.5 },
-      { code: 'abs', qtd_evaluations: 2, name: 'terceiro projeto', average: 8.5 },
-      { code: 'abs', qtd_evaluations: 2, name: 'quarto projeto', average: null },
-      { code: 'abs', qtd_evaluations: 2, name: 'quinto projeto', average: 9.6 },
-      { code: 'abs', qtd_evaluations: 2, name: 'primeiro projeto', average: 5.5 },
-      { code: 'abs', qtd_evaluations: 2, name: 'segundo projeto', average: 3.5 },
-      { code: 'abs', qtd_evaluations: 2, name: 'terceiro projeto', average: 8.5 },
-      { code: 'abs', qtd_evaluations: 2, name: 'quarto projeto', average: null },
-      { code: 'abs', qtd_evaluations: 2, name: 'quinto projeto', average: 9.6 },
-      { code: 'abs', qtd_evaluations: 2, name: 'primeiro projeto', average: 5.5 },
-      { code: 'abs', qtd_evaluations: 2, name: 'segundo projeto', average: 3.5 },
-      { code: 'abs', qtd_evaluations: 2, name: 'terceiro projeto', average: 8.5 },
-      { code: 'abs', qtd_evaluations: 2, name: 'quarto projeto', average: null },
-      { code: 'abs', qtd_evaluations: 2, name: 'quinto projeto', average: 9.6 },
-    ],
-    currentPage: 1,
-    lenghtOfPages: 4,
   }),
   computed: {
     ...mapGetters('permissions', [
       'getIsAdmin',
-    ])
+    ]),
+    ...mapGetters('projects', [
+      'getProjects',
+      'getCurrentPage',
+      'getLenghtOfPages',
+    ]),
+    currentPage: {
+      get() {
+        return this.getCurrentPage;
+      },
+      set(value) {
+        this.setCurrentPage(value);
+      }
+    },
+  },
+  mounted() {
+    !this.getProjects.length && this.getProjectsByPage(1);
   },
   methods: {
     ...mapMutations('projects', [
+      'setProjects',
+      'setCurrentPage',
+      'setLenghtOfPages',
       'setCurrentProject',
     ]),
-    goToProject (event) {
-      this.setCurrentProject(event);
+    goToProject (project) {
+      this.setCurrentProject(project);
       this.$router.push({ name: 'showProject' });
     },
     getProjectsByPage (page) {
-      if (page == this.currentPage) return;
-      this.currentPage = page;
-      // TODO get projects
+      this.loading = true;
+      let params = {};
+      if (this.getIsAdmin) {
+        params = { page };
+      }
+      projectService.list(params)
+        .then((response) => {
+          this.setProjects(response.data);
+          this.loading = false;
+          this.setLenghtOfPages(response?.meta?.pages || 1);
+        })
+        .catch(() => {
+          this.loading = false;
+        })
     },
   },
 });
@@ -130,5 +181,4 @@ td {
 tr:hover {
   background-color: rgb(var(--v-theme-light_primary));
 }
-
 </style>

@@ -10,13 +10,6 @@
       width="448"
       rounded="lg"
     >
-      <p
-        v-if="message"
-        class="text-center"
-      >
-        {{ message }}
-      </p>
-
       <v-text-field
         v-model="state.email"
         label="E-mail"
@@ -97,7 +90,6 @@ export default {
     requiredMessage: "O campo é obrigatório",
     minMessage: "O campo deve ter no mínimo 8 caracteres",
     emailMessage: "O E-mail inserido é inválido",
-    message: "",
     loading: false,
     showPassword: false,
   }),
@@ -124,7 +116,6 @@ export default {
       "setToken",
     ]),
     login() {
-      this.message = "";
       this.v$.$touch()
       if (this.v$.$invalid) return;
       this.loading = true;
@@ -137,13 +128,9 @@ export default {
           this.setToken(data?.authorization?.token || '');
           this.$router.push({ name: 'listEvents' });
         })
-        .catch(error => {
-          this.message = error.response?.data?.message ||
-            "Erro ao processar Solicitação, tente novamente";
-        })
-        .finally(() => {
+        .catch(() => {
           this.loading = false;
-        });
+        })
     },
   },
 }
