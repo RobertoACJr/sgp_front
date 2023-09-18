@@ -1,15 +1,115 @@
 <template>
   <v-container>
     <div
-      class="text-h3 heading-3 mb-5"
+      class="text-h6 heading-6 mb-5"
     >
-      {{ getCurrentProject.name }}
+      {{ getCurrentProject.title }}
     </div>
+    <v-row>
+      <v-col
+        cols="9"
+        :md="showAverage ? 10 : 12"
+        :sm="showAverage ? 10 : 12"
+      >
+        <v-row>
+          <v-col
+            xl="3"
+            md="4"
+            sm="6"
+            cols="12"
+          >
+            <div
+              class="text-body-1 mb-3 font-weight-black"
+            >
+              Orientador
+            </div>
+            {{ getCurrentProject?.advisor_professor?.name || "" }}
+          </v-col>
+          <v-col
+            xl="3"
+            md="4"
+            sm="6"
+            cols="12"
+          >
+            <div
+              class="text-body-1 mb-3 font-weight-black"
+            >
+              Alunos
+            </div>
+            <!-- v-for="(aluno, index) in getCurrentProject?.students_name" -->
+            <p
+              v-for="(aluno, index) in ['maria algusta', 'foo bar']"
+              :key="index"
+            >
+              {{ aluno }}
+            </p>
+          </v-col>
+          <v-col
+            xl="3"
+            md="4"
+            sm="6"
+            cols="12"
+          >
+            <div
+              class="text-body-1 mb-3 font-weight-black"
+            >
+              Área
+            </div>
+            {{ getCurrentProject?.knowledge_area || "" }}
+          </v-col>
+          <v-col
+            xl="3"
+            md="4"
+            sm="6"
+            cols="12"
+          >
+            <div
+              class="text-body-1 mb-3 font-weight-black"
+            >
+              Nível
+            </div>
+            {{ getCurrentProject?.teaching_level || "" }}
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col
+        v-if="showAverage"
+        class="d-flex align-center flex-column"
+        cols="3"
+        md="2"
+        sm="2"
+      >
+        <div
+          class="text-body-1 mb-3 font-weight-black"
+        >
+          Média
+        </div>
+        <v-progress-circular
+          v-model="getProgressValue"
+          class="mb-3"
+          :size="100"
+          :width="10"
+          :color="getProgressColor"
+        >
+          {{ getCurrentProject?.average }}
+        </v-progress-circular>
+        <p>avaliações: {{ getCurrentProject.evaluations_quantity || "não avaliado" }}</p>
+      </v-col>
+    </v-row>
     <v-row v-if="getIsAdmin">
-      <v-col :md="12">
+      <v-col
+        md="12"
+        sm="12"
+      >
+        <div
+          class="text-body-1 mb-3 font-weight-black"
+        >
+          Avaliações
+        </div>
         <v-table
+          v-if="evaluations.length"
           fixed-header
-          height="500px"
+          height="fit-content"
         >
           <thead>
             <tr>
@@ -29,10 +129,14 @@
               v-for="(evaluation, index) in evaluations"
               :key="index"
               :class="{'inactive': !evaluation.active}"
-              @click="goToProject(evaluation)"
+              @click="goToEvaluation(evaluation)"
             >
-              <td>{{ evaluation.evaluator_name }}</td>
-              <td>{{ evaluation.score }}</td>
+              <td class="text-body-2">
+                {{ evaluation.evaluator_name }}
+              </td>
+              <td class="text-body-2">
+                {{ evaluation.score }}
+              </td>
               <td>
                 <v-btn
                   icon
@@ -50,14 +154,12 @@
             </tr>
           </tbody>
         </v-table>
-      </v-col>
-      <v-col :md="12">
-        <v-pagination
-          :value="currentPage"
-          :length="lenghtOfPages"
-          rounded="circle"
-          @update:model-value="getProjectsByPage"
-        />
+        <div
+          v-else
+          class="mb-5"
+        >
+          Ainda não avaliado
+        </div>
       </v-col>
     </v-row>
     <v-btn 
@@ -66,40 +168,35 @@
       color="tertiary"
       size="large"
       variant="tonal"
-      :to="{ name: 'rateProject' }"
+      @click="validateProjectCode"
     >
       Avaliar Projeto
     </v-btn>
   </v-container>
+  <ModalValidateProjectCode
+    :is-open="isModalValidateCodeOpen"
+    :project-code="getCurrentProject.code"
+    @is-valid="rateProject"
+    @close="() => isModalValidateCodeOpen = false"
+  />
 </template>
 
 <script>
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 
+import ModalValidateProjectCode from "@/modules/projects/components/ModalValidateProjectCode.vue";
 
 // TODO informações da avaliação
 export default defineComponent({
   name: 'ShowProject',
+  components: {
+    ModalValidateProjectCode,
+  },
   data: () => ({
     loading: false,
-    evaluations: [
-      { evaluator_name: 'Pipipi popopo', score: 5.5, active: true },
-      { evaluator_name: 'outro nome', score: 3.5, active: true },
-      { evaluator_name: 'palminha um', score: 8.5, active: true },
-      { evaluator_name: 'huguinho rei delas', score: 6.7, active: true },
-      { evaluator_name: 'tonin n toma banho', score: 9.6, active: false },
-      { evaluator_name: 'projeto dos projetos', score: 5.5, active: true },
-      { evaluator_name: 'algum nome', score: 3.5, active: true },
-      { evaluator_name: 'algum outro nome', score: 8.5, active: true },
-      { evaluator_name: 'mais um nome', score: 5.4, active: true },
-      { evaluator_name: 'n tenho mais ideia', score: 9.6, active: true },
-      { evaluator_name: 'acabou a criatividade', score: 5.5, active: true },
-      { evaluator_name: 'mas o tonin n toma banho mesmo', score: 3.5, active: false },
-      { evaluator_name: 'fiiuu, e o pix?', score: 8.5, active: true },
-      { evaluator_name: 'Kaizoku ore wa naru', score: 9.8, active: true },
-      { evaluator_name: 'Pipipi popopo', score: 9.6, active: true },
-    ],
+    isModalValidateCodeOpen: false,
+    evaluations: [],
   }),
   computed: {
     ...mapGetters('permissions', [
@@ -107,9 +204,29 @@ export default defineComponent({
     ]),
     ...mapGetters('projects', [
       'getCurrentProject',
-    ])
+    ]),
+    getProgressColor() {
+      if (this.getCurrentProject.average < 6) return 'tertiary';
+      else if (this.getCurrentProject.average < 8) return 'warning';
+      return 'success';
+    },
+    getProgressValue() {
+      return parseInt(this.getCurrentProject?.average) * 10;
+    },
+    showAverage() {
+      return this.getIsAdmin && this.getCurrentProject?.evaluations_quantity;
+    }
   },
   methods: {
+    validateProjectCode() {
+      this.isModalValidateCodeOpen = true;
+    },
+    rateProject() {
+      this.$router.push({ name: "rateProject" })
+    },
+    goToEvaluation(evaluation) {
+      console.log(evaluation)
+    }
   },
 });
 </script>

@@ -64,6 +64,7 @@ export default defineComponent({
         .then(({ data }) => {
           this.setPermissions(data.permissions);
           this.setRole(data.role);
+          this.$router.push({ name: "listProjects" });
         })
         .catch(() => {
           // TODO

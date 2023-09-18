@@ -11,7 +11,7 @@ export default [
       needsAuthentication: true,
       mainModule: "projects",
       hasNavBar: true,
-      hasPreviousView: 'showEvent',
+      hasPreviousView: 'listEvents',
     }
   },
   {

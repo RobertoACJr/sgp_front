@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div
-      class="text-h3 heading-3 mb-5"
+      class="text-h6 heading-6 mb-5"
     >
       Lista de Eventos
     </div>
@@ -14,7 +14,9 @@
       <v-col
         v-for="(event, key) in events"
         :key="key"
+        cols="12"
         md="4"
+        sm="6"
       >
         <CardEvent
           :event-title="event.text"
