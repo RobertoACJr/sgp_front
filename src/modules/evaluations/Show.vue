@@ -114,19 +114,14 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 
 export default defineComponent({
   name: 'ShowEvaluations',
-  props: {
-    evaluationIndex: {
-      type: Number,
-      default: 0,
-    }
-  },
   computed: {
     ...mapGetters('projects', [
       'getCurrentProject',
+      'getCurrentEvaluation',
     ]),
     getProgressColor() {
       if (this.getCurrentProject.average < 6) return 'tertiary';
@@ -137,8 +132,16 @@ export default defineComponent({
       return parseInt(this.getCurrentProject?.average) * 10;
     },
     getEvaluation() {
-      return this.getCurrentProject.evaluations[this.evaluationIndex];
+      return this.getCurrentEvaluation;
     },
   },
+  beforeUnmount() {
+    this.setCurrentProjectEvaluationIndex(null);
+  },
+  methods: {
+    ...mapMutations('projects', [
+      'setCurrentProjectEvaluationIndex'
+    ]),
+  }
 });
 </script>

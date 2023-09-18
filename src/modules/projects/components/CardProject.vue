@@ -11,11 +11,10 @@
       class="align-end"
       height="200px"
       cover
-    >
-      <v-card-title
-        v-text="projectTitle"
-      />
-    </v-img>
+    />
+    <v-card-title
+      v-text="projectTitle"
+    />
   </v-card>
 </template>
 
@@ -39,10 +38,9 @@ export default {
 }
 </script>
 
-<style lang="scss" scope>
-.card-project-container {
-  display: flex;
-  gap: 16px;
-  flex-direction: column;
+<style lang="scss" scoped>
+.v-card-title {
+  font-size: 14px;
+  line-height: initial;
 }
 </style>

@@ -14,7 +14,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .loading-container {
   width: 100vw;
   height: 100vh;
