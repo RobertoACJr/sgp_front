@@ -20,16 +20,25 @@
       </v-btn>
     </v-app-bar>
     <v-main>
-      <router-view />
+      <v-container class="h-100">
+        <router-view />
+      </v-container>
     </v-main>
   </v-app>
+  <Toast />
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
+import Toast from './modules/core/components/Toast.vue';
+
 export default {
   name: 'App',
+
+  components: {
+    Toast,
+  },
 
   computed: {
     ...mapGetters([
@@ -44,9 +53,6 @@ export default {
 
   methods: {
     ...mapActions("auth", ["isSigned"]),
-    goBack() {
-      
-    },
   },
 }
 </script>
