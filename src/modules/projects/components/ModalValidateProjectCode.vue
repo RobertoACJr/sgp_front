@@ -139,7 +139,9 @@ export default {
             this.showInvalidCodeWarning = response;
           });
       } else {
-        if (this.code.toUpperCase() == this.projectCode.toUpperCase()) {
+        const code = this.code.replace('-', '').toUpperCase();
+        const projectCode = this.projectCode.replace('-', '').toUpperCase();
+        if (code == projectCode) {
           this.$emit("is-valid")
         } else {
           this.showInvalidCodeWarning = true;

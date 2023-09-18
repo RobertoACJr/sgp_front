@@ -3,6 +3,7 @@ const defaultState = () => ({
     currentProject: {},
     currentPage: 1,
     lengthOfPages: 1,
+    currentProjectEvaluationIndex: null,
 })
 
 export default {
@@ -13,6 +14,8 @@ export default {
     getCurrentProject: state => state.currentProject,
     getCurrentPage: state => state.currentPage,
     getLenghtOfPages: state => state.lengthOfPages,
+    getCurrentProjectEvaluationIndex: state => state.currentProjectEvaluationIndex,
+    getCurrentEvaluation: state => state.currentProject?.evaluations[state.currentProjectEvaluationIndex] || {},
   },
   mutations: {
     reset(state) {
@@ -29,6 +32,9 @@ export default {
     },
     setLenghtOfPages (state, lengthOfPages) {
       state.lengthOfPages = lengthOfPages;
+    },
+    setCurrentProjectEvaluationIndex(state, index) {
+      state.currentProjectEvaluationIndex = index;
     },
   },
   actions: {

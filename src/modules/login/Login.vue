@@ -22,7 +22,7 @@
         :type="showPassword ? 'text' : 'password'"
         :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
         :error-messages="getPasswordErrors"
-        @click="showPassword = !showPassword"
+        @click:append-inner="showPassword = !showPassword"
       />
 
       <!-- <v-card
@@ -136,7 +136,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .login-container {
   display: flex;
   height: 100%;

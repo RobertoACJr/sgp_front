@@ -22,13 +22,18 @@
       </v-btn>
     </div>
     <loading v-if="loading" />
+    <div
+      v-else-if="!getProjects.length"
+      class="no-content"
+    >
+      Nenhum Projeto Encontrado
+    </div>
     <v-row v-else-if="getIsAdmin">
       <v-col
         md="12"
         sm="12"
       >
         <v-table
-          v-if="getProjects.length"
           fixed-header
           height="70vh"
         >
@@ -69,12 +74,6 @@
             </tr>
           </tbody>
         </v-table>
-        <div
-          v-else
-          class="mb-5"
-        >
-          Nenhum Projeto Encontrado
-        </div>
       </v-col>
       <v-col
         v-if="getLenghtOfPages > 1"
@@ -92,7 +91,9 @@
       <v-col
         v-for="(project, key) in getProjects"
         :key="key"
+        cols="12"
         md="4"
+        sm="6"
       >
         <CardProject
           :project-title="project.title"

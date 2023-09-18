@@ -70,9 +70,6 @@ export default defineComponent({
           // TODO
           // algum tratamento
         })
-        .finally(() => {
-          this.loading = false;
-        })
     },
   },
 });

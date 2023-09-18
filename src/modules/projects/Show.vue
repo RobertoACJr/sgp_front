@@ -258,10 +258,13 @@ export default defineComponent({
     }
   },
   mounted() {
-    this.getIsAdmin && this.getProjectInformations();
+    this.getProjectInformations();
   },
   methods: {
-    ...mapMutations('projects', ['setCurrentProject']),
+    ...mapMutations('projects', [
+      'setCurrentProject',
+      'setCurrentProjectEvaluationIndex'
+    ]),
     validateProjectCode() {
       this.isModalValidateCodeOpen = true;
     },
@@ -269,7 +272,8 @@ export default defineComponent({
       this.$router.push({ name: "rateProject" })
     },
     goToEvaluation(index) {
-      this.$router.push({ name: "showEvaluation", params: { evaluationIndex: index }});
+      this.setCurrentProjectEvaluationIndex(index)
+      this.$router.push({ name: "showEvaluation" });
     },
     getProjectInformations() {
       this.loading = true;
