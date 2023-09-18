@@ -1,5 +1,6 @@
 <template>
-  <v-container>
+  <loading v-if="loading" />
+  <v-container v-else>
     <div
       class="text-h6 heading-6 mb-5"
     >
@@ -23,7 +24,21 @@
             >
               Orientador
             </div>
-            {{ getCurrentProject?.advisor_professor?.name || "" }}
+            {{ getCurrentProject?.advisor_professor || "" }}
+          </v-col>
+          <v-col
+            v-if="getCurrentProject?.co_advisor_professor"
+            xl="3"
+            md="4"
+            sm="6"
+            cols="12"
+          >
+            <div
+              class="text-body-1 mb-3 font-weight-black"
+            >
+              Co-orientador
+            </div>
+            {{ getCurrentProject?.co_advisor_professor || "" }}
           </v-col>
           <v-col
             xl="3"
@@ -36,12 +51,11 @@
             >
               Alunos
             </div>
-            <!-- v-for="(aluno, index) in getCurrentProject?.students_name" -->
             <p
-              v-for="(aluno, index) in ['maria algusta', 'foo bar']"
+              v-for="(name, index) in getCurrentProject?.students_name"
               :key="index"
             >
-              {{ aluno }}
+              {{ name }}
             </p>
           </v-col>
           <v-col
@@ -66,9 +80,35 @@
             <div
               class="text-body-1 mb-3 font-weight-black"
             >
+              Categoria
+            </div>
+            {{ getCurrentProject?.category || "" }}
+          </v-col>
+          <v-col
+            xl="3"
+            md="4"
+            sm="6"
+            cols="12"
+          >
+            <div
+              class="text-body-1 mb-3 font-weight-black"
+            >
               Nível
             </div>
             {{ getCurrentProject?.teaching_level || "" }}
+          </v-col>
+          <v-col
+            xl="3"
+            md="4"
+            sm="6"
+            cols="12"
+          >
+            <div
+              class="text-body-1 mb-3 font-weight-black"
+            >
+              Instituição
+            </div>
+            {{ getCurrentProject?.institution || "" }}
           </v-col>
         </v-row>
       </v-col>
@@ -93,7 +133,7 @@
         >
           {{ getCurrentProject?.average }}
         </v-progress-circular>
-        <p>avaliações: {{ getCurrentProject.evaluations_quantity || "não avaliado" }}</p>
+        <p>avaliações: {{ getCurrentProject.evaluations.length || "não avaliado" }}</p>
       </v-col>
     </v-row>
     <v-row v-if="getIsAdmin">
@@ -107,7 +147,7 @@
           Avaliações
         </div>
         <v-table
-          v-if="evaluations.length"
+          v-if="getCurrentProject?.evaluations?.length"
           fixed-header
           height="fit-content"
         >
@@ -126,16 +166,16 @@
           </thead>
           <tbody>
             <tr
-              v-for="(evaluation, index) in evaluations"
+              v-for="(evaluation, index) in getCurrentProject.evaluations"
               :key="index"
               :class="{'inactive': !evaluation.active}"
-              @click="goToEvaluation(evaluation)"
+              @click="goToEvaluation(index)"
             >
               <td class="text-body-2">
-                {{ evaluation.evaluator_name }}
+                {{ evaluation.created_by }}
               </td>
               <td class="text-body-2">
-                {{ evaluation.score }}
+                {{ evaluation.average }}
               </td>
               <td>
                 <v-btn
@@ -183,11 +223,12 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 
 import ModalValidateProjectCode from "@/modules/projects/components/ModalValidateProjectCode.vue";
 
-// TODO informações da avaliação
+import * as projectService from "@/modules/projects/services/projects.service";
+
 export default defineComponent({
   name: 'ShowProject',
   components: {
@@ -196,7 +237,6 @@ export default defineComponent({
   data: () => ({
     loading: false,
     isModalValidateCodeOpen: false,
-    evaluations: [],
   }),
   computed: {
     ...mapGetters('permissions', [
@@ -214,19 +254,35 @@ export default defineComponent({
       return parseInt(this.getCurrentProject?.average) * 10;
     },
     showAverage() {
-      return this.getIsAdmin && this.getCurrentProject?.evaluations_quantity;
+      return this.getIsAdmin && this.getCurrentProject?.evaluations && this.getCurrentProject?.evaluations?.length;
     }
   },
+  mounted() {
+    this.getIsAdmin && this.getProjectInformations();
+  },
   methods: {
+    ...mapMutations('projects', ['setCurrentProject']),
     validateProjectCode() {
       this.isModalValidateCodeOpen = true;
     },
     rateProject() {
       this.$router.push({ name: "rateProject" })
     },
-    goToEvaluation(evaluation) {
-      console.log(evaluation)
-    }
+    goToEvaluation(index) {
+      this.$router.push({ name: "showEvaluation", params: { evaluationIndex: index }});
+    },
+    getProjectInformations() {
+      this.loading = true;
+      projectService.show(this.getCurrentProject.uuid)
+        .then(({ data }) => {
+          this.setCurrentProject(data)
+          this.loading = false;
+        }).catch(error => {
+          console.error(error);
+          this.$router.push({ name: 'listProjects' });
+          return false;
+        })
+    },
   },
 });
 </script>
