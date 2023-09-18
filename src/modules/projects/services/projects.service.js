@@ -15,6 +15,21 @@ export const list = async params => {
   }
 }
 
+export const show = async uuid => {
+  try {
+    const { data } = await projectApi.show(uuid);
+    return data;
+  } catch (error) {
+    console.error(error);
+    window.$vue.$store.dispatch("setToastConfig", {
+      status: "error",
+      title: "Falha ao requisitar informações do Projeto",
+      text: error.response.data.message || "",
+    })
+    throw error;
+  }
+}
+
 export const rate = async params => {
   try {
     const { data } = await projectApi.rate(params);

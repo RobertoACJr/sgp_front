@@ -2,7 +2,7 @@ const defaultState = () => ({
     projects: [],
     currentProject: {},
     currentPage: 1,
-    lenghtOfPages: 1,
+    lengthOfPages: 1,
 })
 
 export default {
@@ -12,7 +12,7 @@ export default {
     getProjects: state => state.projects,
     getCurrentProject: state => state.currentProject,
     getCurrentPage: state => state.currentPage,
-    getLenghtOfPages: state => state.lenghtOfPages,
+    getLenghtOfPages: state => state.lengthOfPages,
   },
   mutations: {
     reset(state) {
@@ -27,8 +27,8 @@ export default {
     setCurrentPage (state, currentPage) {
       state.currentPage = currentPage;
     },
-    setLenghtOfPages (state, lenghtOfPages) {
-      state.lenghtOfPages = lenghtOfPages;
+    setLenghtOfPages (state, lengthOfPages) {
+      state.lengthOfPages = lengthOfPages;
     },
   },
   actions: {

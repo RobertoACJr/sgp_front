@@ -22,7 +22,7 @@
           sm="12"
         >
           <div
-            class="text-body-2 mb-3"
+            class="text-h6 heading-6 mb-3"
           >
             {{ criterion.title }}
           </div>
