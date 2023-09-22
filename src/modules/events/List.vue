@@ -55,9 +55,11 @@ export default defineComponent({
   },
   mounted() {
     this.getEvents();
+    this.reset();
   },
   methods: {
     ...mapMutations("events", ["setCurrentEvent"]),
+    ...mapMutations('projects', ['reset']),
     getEvents() {
       eventsService.list({ userUuid: this.getUserUuid })
         .then(({ data }) => {

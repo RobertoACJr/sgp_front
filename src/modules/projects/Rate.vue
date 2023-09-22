@@ -17,7 +17,6 @@
           v-for="(criterion, i) in criteria"
           :key="i"
           cols="12"
-          xl="6"
           md="12"
           sm="12"
         >
@@ -30,6 +29,7 @@
             <v-col
               v-for="(evaluation, j) in criterion.sub_criteria"
               :key="j"
+              class="d-flex justify-end flex-column"
               cols="12"
               xl="4"
               md="6"
@@ -91,6 +91,7 @@ import { mapActions, mapGetters, mapMutations } from 'vuex';
 import ModalValidateProjectCode from "@/modules/projects/components/ModalValidateProjectCode.vue";
 
 import * as projectService from "@/modules/projects/services/projects.service";
+import * as evaluationsService from "@/modules/evaluations/services/evaluations.service";
 
 export default {
   name: 'RateProject',
@@ -135,7 +136,7 @@ export default {
     },
     startEvaluation() {
       this.loading = true;
-      projectService.startEvaluation({
+      evaluationsService.startEvaluation({
         project_code: this.getCurrentProject.code,
         project_uuid: this.getCurrentProject.uuid,
       }).then(({ data }) => {
