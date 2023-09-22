@@ -69,7 +69,7 @@
                 {{ project.evaluations_quantity || "não avaliado" }}
               </td>
               <td class="text-body-2 text-center">
-                {{ project.average || "não avaliado" }}
+                {{ project.average ? project.average.toFixed(2) : "não avaliado" }}
               </td>
             </tr>
           </tbody>
@@ -126,6 +126,7 @@ export default defineComponent({
     ]),
     ...mapGetters('projects', [
       'getProjects',
+      'getFetchProjectsList',
       'getCurrentPage',
       'getLenghtOfPages',
     ]),
@@ -139,7 +140,7 @@ export default defineComponent({
     },
   },
   mounted() {
-    !this.getProjects.length && this.getProjectsByPage(1);
+    this.getFetchProjectsList && this.getProjectsByPage();
   },
   methods: {
     ...mapMutations('projects', [
@@ -147,22 +148,24 @@ export default defineComponent({
       'setCurrentPage',
       'setLenghtOfPages',
       'setCurrentProject',
+      'setFetchProjectsList',
     ]),
     goToProject (project) {
       this.setCurrentProject(project);
       this.$router.push({ name: 'showProject' });
     },
-    getProjectsByPage (page) {
+    getProjectsByPage () {
       this.loading = true;
       let params = {};
       if (this.getIsAdmin) {
-        params = { page };
+        params = { page: this.getCurrentPage };
       }
       projectService.list(params)
         .then((response) => {
           this.setProjects(response.data);
           this.loading = false;
           this.setLenghtOfPages(response?.meta?.pages || 1);
+          this.setFetchProjectsList(false);
         })
         .catch(() => {
           this.loading = false;

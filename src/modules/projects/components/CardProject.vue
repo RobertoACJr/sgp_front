@@ -9,7 +9,7 @@
     <v-img
       :src="require('@/assets/WallpaperIFMS.png')"
       class="align-end"
-      height="200px"
+      height="120px"
       cover
     />
     <v-card-title
@@ -42,5 +42,6 @@ export default {
 .v-card-title {
   font-size: 14px;
   line-height: initial;
+  white-space: initial;
 }
 </style>

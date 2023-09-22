@@ -169,20 +169,26 @@
               v-for="(evaluation, index) in getCurrentProject.evaluations"
               :key="index"
               :class="{'inactive': !evaluation.active}"
-              @click="goToEvaluation(index)"
             >
-              <td class="text-body-2">
+              <td
+                class="text-body-2"
+                @click="goToEvaluation(index)"
+              >
                 {{ evaluation.created_by }}
               </td>
-              <td class="text-body-2">
-                {{ evaluation.average }}
+              <td
+                class="text-body-2"
+                @click="goToEvaluation(index)"
+              >
+                {{ evaluation.average.toFixed(2) }}
               </td>
-              <td>
+              <td width="fit-content">
                 <v-btn
                   icon
                   :color="evaluation.active ? 'tertiary' : 'primary'"
                   :title="evaluation.active ? 'Desativar Avaliação' : 'Ativar Avaliação'"
                   variant="tonal"
+                  @click="openModalValidateChangeEvaluationStatus(index)"
                 >
                   <v-icon
                     :color="evaluation.active ? 'tertiary' : 'primary'"
@@ -202,7 +208,8 @@
         </div>
       </v-col>
     </v-row>
-    <v-btn 
+    <v-btn
+      v-if="!getIsAdmin"
       block
       class="mt-8"
       color="tertiary"
@@ -219,6 +226,11 @@
     @is-valid="rateProject"
     @close="() => isModalValidateCodeOpen = false"
   />
+  <ModalValidateChangeEvaluationStatus
+    :is-open="isModalValidateChangeEvaluationStatusOpen"
+    @close="() => isModalValidateChangeEvaluationStatusOpen = false"
+    @change="changeEvaluationStatus()"
+  />
 </template>
 
 <script>
@@ -226,17 +238,21 @@ import { defineComponent } from 'vue';
 import { mapGetters, mapMutations } from 'vuex';
 
 import ModalValidateProjectCode from "@/modules/projects/components/ModalValidateProjectCode.vue";
+import ModalValidateChangeEvaluationStatus from "@/modules/projects/components/ModalValidateChangeEvaluationStatus.vue";
 
 import * as projectService from "@/modules/projects/services/projects.service";
+import * as evaluationsService from '@/modules/evaluations/services/evaluations.service.js';
 
 export default defineComponent({
   name: 'ShowProject',
   components: {
     ModalValidateProjectCode,
+    ModalValidateChangeEvaluationStatus,
   },
   data: () => ({
     loading: false,
     isModalValidateCodeOpen: false,
+    isModalValidateChangeEvaluationStatusOpen: false,
   }),
   computed: {
     ...mapGetters('permissions', [
@@ -244,6 +260,8 @@ export default defineComponent({
     ]),
     ...mapGetters('projects', [
       'getCurrentProject',
+      'getCurrentEvaluation',
+      'getFetchProject',
     ]),
     getProgressColor() {
       if (this.getCurrentProject.average < 6) return 'tertiary';
@@ -254,15 +272,22 @@ export default defineComponent({
       return parseInt(this.getCurrentProject?.average) * 10;
     },
     showAverage() {
-      return this.getIsAdmin && this.getCurrentProject?.evaluations && this.getCurrentProject?.evaluations?.length;
+      return this.getIsAdmin &&
+        this.getCurrentProject?.evaluations &&
+        this.getCurrentProject?.evaluations?.length &&
+        !this.getCurrentProject.evaluations.every(a => !a.active);
     }
   },
   mounted() {
-    this.getProjectInformations();
+    this.getFetchProject && this.getProjectInformations();
+  },
+  beforeUnmount() {
+    this.setFetchProject(true);
   },
   methods: {
     ...mapMutations('projects', [
       'setCurrentProject',
+      'setFetchProject',
       'setCurrentProjectEvaluationIndex'
     ]),
     validateProjectCode() {
@@ -272,8 +297,26 @@ export default defineComponent({
       this.$router.push({ name: "rateProject" })
     },
     goToEvaluation(index) {
-      this.setCurrentProjectEvaluationIndex(index)
+      this.setCurrentProjectEvaluationIndex(index);
       this.$router.push({ name: "showEvaluation" });
+    },
+    openModalValidateChangeEvaluationStatus(index) {
+      this.setCurrentProjectEvaluationIndex(index);
+      this.isModalValidateChangeEvaluationStatusOpen = true;
+    },
+    changeEvaluationStatus() {
+      this.isModalValidateChangeEvaluationStatusOpen = false;
+      this.loading = true;
+      evaluationsService.changeEvaluationStatus({
+        project_uuid: this.getCurrentProject.uuid,
+        created_uuid: this.getCurrentEvaluation.uuid,
+      })
+        .then(() => {
+          this.getProjectInformations();
+        })
+        .catch(() => {
+          this.loading = false;
+        })
     },
     getProjectInformations() {
       this.loading = true;
@@ -292,7 +335,16 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+td {
+  cursor: pointer;
+}
+tr:hover {
+  background-color: rgb(var(--v-theme-surface-variant), .2);
+}
 .inactive {
   background-color: rgb(var(--v-theme-light_gray));
+  &:hover{
+    background-color: rgb(var(--v-theme-light_gray), .2);
+  }
 }
 </style>

@@ -44,18 +44,3 @@ export const rate = async params => {
     throw error;
   }
 }
-
-export const startEvaluation = async params => {
-  try {
-    const { data } = await projectApi.startEvaluation(params);
-    return data;
-  } catch (error) {
-    console.error(error);
-    window.$vue.$store.dispatch("setToastConfig", {
-      status: "error",
-      title: "Falha ao iniciar avaliação do Projeto",
-      text: error.response.data.message || "",
-    })
-    throw error;
-  }
-}
