@@ -1,5 +1,6 @@
 <template>
-  <v-container>
+  <loading v-if="loading" />
+  <v-container v-else>
     <div
       class="text-h6 heading-6 mb-5"
     >
@@ -22,6 +23,7 @@
           width="fit-content"
           class="mt-3"
           variant="tonal"
+          @click="openModalValidateChangeEvaluationStatus()"
         >
           <v-icon
             :color="getEvaluation.active ? 'tertiary' : 'primary'"
@@ -47,9 +49,8 @@
           :width="10"
           :color="getProgressColor"
         >
-          {{ getCurrentProject?.average }}
+          {{ getCurrentEvaluation?.average.toFixed(2) }}
         </v-progress-circular>
-        <p>avaliações: {{ getCurrentProject?.evaluations?.length || "não avaliado" }}</p>
       </v-col>
     </v-row>
     <v-row>
@@ -101,7 +102,7 @@
                   {{ criterion.question }}
                 </td>
                 <td class="text-body-2 text-center">
-                  {{ criterion.score }}
+                  {{ criterion.score.toFixed(2) }}
                 </td>
               </tr>
             </template>
@@ -110,26 +111,42 @@
       </v-col>
     </v-row>
   </v-container>
+  <ModalValidateChangeEvaluationStatus
+    :is-open="isModalValidateChangeEvaluationStatusOpen"
+    @close="() => isModalValidateChangeEvaluationStatusOpen = false"
+    @change="changeEvaluationStatus()"
+  />
 </template>
 
 <script>
 import { defineComponent } from 'vue';
 import { mapGetters, mapMutations } from 'vuex';
 
+import * as evaluationsService from '@/modules/evaluations/services/evaluations.service.js';
+
+import ModalValidateChangeEvaluationStatus from "@/modules/projects/components/ModalValidateChangeEvaluationStatus.vue";
+
 export default defineComponent({
   name: 'ShowEvaluations',
+  components: {
+    ModalValidateChangeEvaluationStatus,
+  },
+  data: () => ({
+    loading: false,
+    isModalValidateChangeEvaluationStatusOpen: false,
+  }),
   computed: {
     ...mapGetters('projects', [
       'getCurrentProject',
       'getCurrentEvaluation',
     ]),
     getProgressColor() {
-      if (this.getCurrentProject.average < 6) return 'tertiary';
-      else if (this.getCurrentProject.average < 8) return 'warning';
+      if (this.getCurrentEvaluation.average < 6) return 'tertiary';
+      else if (this.getCurrentEvaluation.average < 8) return 'warning';
       return 'success';
     },
     getProgressValue() {
-      return parseInt(this.getCurrentProject?.average) * 10;
+      return parseInt(this.getCurrentEvaluation?.average) * 10;
     },
     getEvaluation() {
       return this.getCurrentEvaluation;
@@ -137,11 +154,32 @@ export default defineComponent({
   },
   beforeUnmount() {
     this.setCurrentProjectEvaluationIndex(null);
+    this.setFetchProject(false);
   },
   methods: {
     ...mapMutations('projects', [
+      'setFetchProject',
       'setCurrentProjectEvaluationIndex'
     ]),
+    openModalValidateChangeEvaluationStatus() {
+      this.isModalValidateChangeEvaluationStatusOpen = true;
+    },
+    changeEvaluationStatus() {
+      this.isModalValidateChangeEvaluationStatusOpen = false;
+      this.loading = true;
+      evaluationsService.changeEvaluationStatus({
+        project_uuid: this.getCurrentProject.uuid,
+        created_uuid: this.getCurrentEvaluation.uuid,
+      })
+        .then(() => {
+          this.loading = false;
+          this.setFetchProject(true);
+          this.$router.push({ name: 'showProject' });
+        })
+        .catch(() => {
+          this.loading = false;
+        })
+    },
   }
 });
 </script>
