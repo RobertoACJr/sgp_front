@@ -281,13 +281,14 @@ export default defineComponent({
   mounted() {
     this.getFetchProject && this.getProjectInformations();
   },
-  beforeUnmount() {
+  before() {
     this.setFetchProject(true);
   },
   methods: {
     ...mapMutations('projects', [
       'setCurrentProject',
       'setFetchProject',
+      'setFetchProjectsList',
       'setCurrentProjectEvaluationIndex'
     ]),
     validateProjectCode() {
@@ -313,6 +314,7 @@ export default defineComponent({
       })
         .then(() => {
           this.getProjectInformations();
+          this.setFetchProjectsList(true);
         })
         .catch(() => {
           this.loading = false;
