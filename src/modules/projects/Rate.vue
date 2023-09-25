@@ -40,6 +40,7 @@
                 :value="evaluation.score"
                 label=""
                 height="5"
+                maxlength="5"
                 type="number"
                 editable
                 persistent-hint
@@ -48,6 +49,11 @@
                   () => evaluation.required && !evaluation.score ? 'O campo é obrigatório' : true,
                   () => evaluation.score > 10 ? 'A nota não pode ser maior que 10' : true,
                   () => evaluation.score < 0 ? 'A nota não pode ser menor que 0' : true,
+                  () => evaluation.score && evaluation.score.split('.')[1]
+                    ? `${evaluation.score.split('.')[1]}`?.length > 2
+                      ? 'A nota não pode ter tantas casas decimais'
+                      : true
+                    : true,
                 ]"
                 @update:model-value="(d) => evaluation.score = `${d}`.replace(',', '.')"
               />
