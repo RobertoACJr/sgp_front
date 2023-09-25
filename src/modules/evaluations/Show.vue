@@ -133,6 +133,7 @@ export default defineComponent({
   },
   data: () => ({
     loading: false,
+    fetchProjectsOnUnMount: false,
     isModalValidateChangeEvaluationStatusOpen: false,
   }),
   computed: {
@@ -154,11 +155,12 @@ export default defineComponent({
   },
   beforeUnmount() {
     this.setCurrentProjectEvaluationIndex(null);
-    this.setFetchProject(false);
+    this.setFetchProject(this.fetchProjectsOnUnMount);
   },
   methods: {
     ...mapMutations('projects', [
       'setFetchProject',
+      'setFetchProjectsList',
       'setCurrentProjectEvaluationIndex'
     ]),
     openModalValidateChangeEvaluationStatus() {
@@ -173,7 +175,8 @@ export default defineComponent({
       })
         .then(() => {
           this.loading = false;
-          this.setFetchProject(true);
+          this.fetchProjectsOnUnMount = true;
+          this.setFetchProjectsList(true);
           this.$router.push({ name: 'showProject' });
         })
         .catch(() => {
