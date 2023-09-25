@@ -5,6 +5,7 @@
       class="text-h6 heading-6 mb-5"
     >
       {{ getCurrentProject.title }}
+      {{ getIsAdmin ? ` - ${getCurrentProject.code}` : '' }}
     </div>
     <v-row>
       <v-col
