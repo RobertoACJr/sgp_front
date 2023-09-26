@@ -2,10 +2,10 @@ version: '3.7'
 
 services:
   app:
-    build: .
+    build:
+      context: './docker/${VUE_APP_ENV}'
     container_name: sgp_front
     ports:
       - '16900:16900'
     volumes:
       - ./:/app
-    command: 'npm run serve' # for NPM manager

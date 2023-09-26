@@ -1,0 +1,19 @@
+FROM node:18
+
+RUN echo 'INICIANDO CONTAINER DE PRODUCAO'
+
+RUN npm install -g serve
+
+RUN mkdir /app
+
+WORKDIR /app
+
+COPY . /app
+
+RUN echo 'GERANDO BUILD'
+
+RUN npm run build --loglevel=verbose
+
+RUN echo 'INICIANDO SERVIDOR ESTATICO'
+
+CMD [ "serve", "-s", "dist" ]
