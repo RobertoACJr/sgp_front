@@ -79,7 +79,7 @@ export default {
     })
     const rules = {
       email: { required, email },
-      password: { required, min: minLength(6) },
+      password: { required, min: minLength(4) },
     }
 
     const v$ = useVuelidate(rules, state)
@@ -88,7 +88,7 @@ export default {
   },
   data: () => ({
     requiredMessage: "O campo é obrigatório",
-    minMessage: "O campo deve ter no mínimo 8 caracteres",
+    minMessage: "O campo deve ter no mínimo 4 caracteres",
     emailMessage: "O E-mail inserido é inválido",
     loading: false,
     showPassword: false,
