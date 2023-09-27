@@ -3,7 +3,8 @@ version: '3.7'
 services:
   app:
     build:
-      context: './docker/${VUE_APP_ENV}'
+      context: .
+      dockerfile: './docker/${VUE_APP_ENV}/dockerfile'
     container_name: sgp_front
     ports:
       - '16900:16900'

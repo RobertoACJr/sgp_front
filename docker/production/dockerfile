@@ -1,8 +1,8 @@
-FROM node:18
+FROM node:20
 
-RUN echo 'INICIANDO CONTAINER DE PRODUCAO'
+RUN echo 'INICIANDO CONTAINER DE DESENVOLVIMENTO'
 
-RUN npm install -g serve
+RUN npm install -g @vue/cli
 
 RUN mkdir /app
 
@@ -10,10 +10,4 @@ WORKDIR /app
 
 COPY . /app
 
-RUN echo 'GERANDO BUILD'
-
-RUN npm run build --loglevel=verbose
-
-RUN echo 'INICIANDO SERVIDOR ESTATICO'
-
-CMD [ "serve", "-s", "dist" ]
+CMD [ "npm", "run", "serve" ]
