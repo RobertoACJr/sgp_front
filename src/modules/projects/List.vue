@@ -141,6 +141,7 @@ export default defineComponent({
   },
   mounted() {
     this.getFetchProjectsList && this.getProjectsByPage();
+    this.setFetchProject(true);
   },
   methods: {
     ...mapMutations('projects', [
@@ -148,6 +149,7 @@ export default defineComponent({
       'setCurrentPage',
       'setLenghtOfPages',
       'setCurrentProject',
+      'setFetchProject',
       'setFetchProjectsList',
     ]),
     goToProject (project) {
