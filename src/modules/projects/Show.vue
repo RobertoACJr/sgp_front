@@ -281,8 +281,6 @@ export default defineComponent({
   },
   mounted() {
     this.getFetchProject && this.getProjectInformations();
-  },
-  before() {
     this.setFetchProject(true);
   },
   methods: {
