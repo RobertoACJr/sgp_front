@@ -27,7 +27,7 @@
         <v-btn
           icon
           class="mr-3"
-          disabled
+          :disabled="loading"
           title="Exportar Informações dos Avaliadores"
           @click="exportEvaluators"
         >
@@ -189,7 +189,9 @@ export default defineComponent({
     },
     getProjectsByPage () {
       this.loading = true;
-      let params = {};
+      let params = {
+        per_page: 100,
+      };
       if (this.getIsAdmin) {
         params = { page: this.getCurrentPage };
       }
