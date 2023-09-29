@@ -8,18 +8,48 @@
       >
         Lista de Projetos
       </div>
-      <v-btn
-        v-if="getIsAdmin && !loading"
-        icon
-        title="Recarregar Listagem"
-        @click="getProjectsByPage(1)"
+      <div
+        v-if="getIsAdmin"
       >
-        <v-icon
-          color="primary"
+        <v-btn
+          icon
+          :disabled="loading"
+          class="mr-3"
+          title="Exportar Ranking de Projetos"
+          @click="exportProjectsRanking"
         >
-          mdi-sync
-        </v-icon>
-      </v-btn>
+          <v-icon
+            color="primary"
+          >
+            mdi-file-download-outline
+          </v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          class="mr-3"
+          disabled
+          title="Exportar Informações dos Avaliadores"
+          @click="exportEvaluators"
+        >
+          <v-icon
+            color="primary"
+          >
+            mdi-account-circle-outline
+          </v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          title="Recarregar Listagem"
+          :disabled="loading"
+          @click="getProjectsByPage()"
+        >
+          <v-icon
+            color="primary"
+          >
+            mdi-sync
+          </v-icon>
+        </v-btn>
+      </div>
     </div>
     <loading v-if="loading" />
     <div
@@ -111,6 +141,7 @@ import { mapGetters, mapMutations } from 'vuex';
 import CardProject from '@/modules/projects/components/CardProject.vue';
 
 import * as projectService from '@/modules/projects/services/projects.service';
+import * as exportService from '@/modules/projects/services/export.service';
 
 export default defineComponent({
   name: 'ListProjects',
@@ -168,6 +199,28 @@ export default defineComponent({
           this.loading = false;
           this.setLenghtOfPages(response?.meta?.pages || 1);
           this.setFetchProjectsList(false);
+        })
+        .catch(() => {
+          this.loading = false;
+        })
+    },
+    exportProjectsRanking() {
+      this.loading = true;
+      exportService.exportProjectsRanking()
+        .then((response) => {
+          response?.data?.url && window.open(response.data.url, '_blank')
+          this.loading = false;
+        })
+        .catch(() => {
+          this.loading = false;
+        })
+    },
+    exportEvaluators () {
+      this.loading = true;
+      exportService.exportEvaluators()
+        .then((response) => {
+          response?.data?.url && window.open(response.data.url, '_blank')
+          this.loading = false;
         })
         .catch(() => {
           this.loading = false;
