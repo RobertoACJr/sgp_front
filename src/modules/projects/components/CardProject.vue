@@ -13,6 +13,7 @@
       cover
     />
     <v-card-title
+      class="white-space-initial"
       v-text="projectTitle"
     />
   </v-card>
@@ -42,6 +43,8 @@ export default {
 .v-card-title {
   font-size: 14px;
   line-height: initial;
+}
+.white-space-initial {
   white-space: initial;
 }
 </style>

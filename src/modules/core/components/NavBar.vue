@@ -26,7 +26,6 @@
       {{ getUser?.name?.split(" ")[0] }}
     </div>
     <v-app-bar-nav-icon
-      v-if="getIsAdmin"
       class="align-self-end"
       @click="() => drawer = !drawer"
     />
