@@ -1,11 +1,14 @@
 const defaultState = () => ({
-    projects: [],
-    currentProject: {},
-    currentPage: 1,
-    lengthOfPages: 1,
+  projects: [],
+  currentProject: {},
+  currentPage: 1,
+  lengthOfPages: 1,
   fetchProject: true,
   fetchProjectsList: true,
-    currentProjectEvaluationIndex: null,
+  currentProjectEvaluationIndex: null,
+  categoryFilter: null,
+  teachingLevelFilter: null,
+  knowledgeAreaFilter: null,
 })
 
 export default {
@@ -22,6 +25,9 @@ export default {
     getCurrentEvaluation: state => state.currentProject?.evaluations
       ? state.currentProject?.evaluations[state.currentProjectEvaluationIndex]
       : {},
+    getCategoryFilter: state => state.categoryFilter,
+    getTeachingLevelFilter: state => state.teachingLevelFilter,
+    getKnowledgeAreaFilter: state => state.knowledgeAreaFilter,
   },
   mutations: {
     reset(state) {
@@ -47,6 +53,25 @@ export default {
     },
     setCurrentProjectEvaluationIndex(state, index) {
       state.currentProjectEvaluationIndex = index;
+    },
+    setCategoryFilter(state, category) {
+      state.categoryFilter = category;
+    },
+    setTeachingLevelFilter(state, teachingLevel) {
+      state.teachingLevelFilter = teachingLevel;
+    },
+    setKnowledgeAreaFilter(state, knowledgeArea) {
+      state.knowledgeAreaFilter = knowledgeArea;
+    },
+    setFilters(state, { category, teachingLevel, knowledgeArea }) {
+      state.categoryFilter = category;
+      state.teachingLevelFilter = teachingLevel;
+      state.knowledgeAreaFilter = knowledgeArea;
+    },
+    resetFilters(state) {
+      state.categoryFilter = null;
+      state.teachingLevelFilter = null;
+      state.knowledgeAreaFilter = null;
     },
   },
   actions: {
