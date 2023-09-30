@@ -13,6 +13,7 @@
 <script>
 import Toast from '@/modules/core/components/Toast.vue';
 import NavBar from '@/modules/core/components/NavBar.vue';
+import { mapMutations } from 'vuex';
 
 export default {
   name: 'App',
@@ -23,7 +24,13 @@ export default {
   },
 
   mounted() {
-    this.$router.push({ name: "listEvents" });
+    this.initializeStore();
   },
+
+  methods: {
+    ...mapMutations([
+      'initializeStore',
+    ])
+  }
 }
 </script>
