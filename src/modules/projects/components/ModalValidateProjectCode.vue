@@ -14,7 +14,9 @@
             color="primary"
             :title="title"
           />
-          <v-card-title>
+          <v-card-title
+            class="white-space-initial"
+          >
             {{ text }}
           </v-card-title>
           <v-card-text>
@@ -65,7 +67,7 @@
         title="Código Inválido"
       />
       <v-card-title
-        class="text-center"
+        class="text-center white-space-initial"
       >
         {{ invalidCodeMsg }}
       </v-card-title>
@@ -157,7 +159,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.v-card-title {
-  white-space: wrap;
+.white-space-initial {
+  white-space: initial !important;
 }
 </style>

@@ -13,6 +13,7 @@
       cover
     >
       <v-card-title
+        class="white-space-initial"
         v-text="eventTitle"
       />
     </v-img>
@@ -38,3 +39,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.white-space-initial {
+  white-space: initial !important;
+}
+</style>
