@@ -5,7 +5,7 @@ import events from '@/modules/events/store/events.store.js';
 import permissions from '@/modules/core/store/permissions.store.js';
 import projects from '@/modules/projects/store/projects.store.js';
 
-export default createStore({
+const store = createStore({
   state: {
     showNavBar: false,
     hasViewToGoBack: false,
@@ -21,6 +21,13 @@ export default createStore({
     setHasViewToGoBack (state, hasViewToGoBack) {
       state.hasViewToGoBack = hasViewToGoBack;
     },
+    initializeStore(state) {
+      if (localStorage.getItem('store')) {
+        this.replaceState(
+          Object.assign(state, JSON.parse(localStorage.getItem('store')))
+        );
+      }
+    }
   },
   actions: {
     setNavBarConfig({ commit }, to) {
@@ -43,3 +50,9 @@ export default createStore({
     projects,
   }
 })
+
+store.subscribe((mutation, state) => {
+  localStorage.setItem('store', JSON.stringify(state));
+});
+
+export default store;

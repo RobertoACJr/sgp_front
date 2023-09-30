@@ -34,6 +34,11 @@ router.beforeEach(async (to, from, next) => {
       next();
     }
   } else {
+    window.$vue.$store.dispatch("setToastConfig", {
+      status: "error",
+      title: "Usuário não autenticado",
+      text: "Por favor, faça login novamente!"
+    })
     next({ name: 'login' });
   }
 })
