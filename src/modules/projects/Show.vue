@@ -4,6 +4,7 @@
     <div
       class="text-h6 heading-6 mb-5"
     >
+      {{ getCurrentProject.location ? `${getCurrentProject.location} - ` : '' }}
       {{ getCurrentProject.title }}
       {{ getIsAdmin ? ` - ${getCurrentProject.code}` : '' }}
     </div>

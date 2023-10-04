@@ -45,6 +45,7 @@
                 editable
                 persistent-hint
                 outline
+                placeholder="Entre 0,00 e 10,00"
                 :rules="[
                   () => evaluation.required && !evaluation.score ? 'O campo é obrigatório' : true,
                   () => evaluation.score > 10 ? 'A nota não pode ser maior que 10' : true,
@@ -158,7 +159,7 @@ export default {
       this.loading = true;
       this.isModalVerifyCodeOpen = false;
       return projectService.rate({
-        validationCode: code,
+        validationCode: code.toLowerCase(),
         project_uuid: this.getCurrentProject.uuid,
         evaluations: this.getMapEvaluations(),
       }).then(async (response) => {
