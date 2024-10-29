@@ -7,6 +7,6 @@ services:
       dockerfile: './docker/${VUE_APP_ENV}/dockerfile'
     container_name: sgp_front
     ports:
-      - '16900:16900'
+      - '80:16900'
     volumes:
       - ./:/app
