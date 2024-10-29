@@ -8,6 +8,7 @@ module.exports = defineConfig({
       port: 16900,
       https: false,
       hot: true,
+      allowedHosts: ['ifmscx.pro.br', 'localhost']
     },
     watch: true,
     watchOptions: {
