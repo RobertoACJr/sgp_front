@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import evaluationsRouter from '@/modules/evaluations/router'
 import eventsRouter from '@/modules/events/router'
+import knowledgeAreaRouter from '@/modules/knowledgeArea/router'
 import projectsRouter from '@/modules/projects/router'
 
 import Login from '@/modules/login/Login.vue'
@@ -16,6 +17,7 @@ const routes = [
   },
   ...evaluationsRouter,
   ...eventsRouter,
+  ...knowledgeAreaRouter,
   ...projectsRouter,
 ]
 
@@ -29,7 +31,7 @@ router.beforeEach(async (to, from, next) => {
   if (isSigned || to.name == 'login') {
     if (to.meta.onlyForAdmin && !window.$vue.$store.getters['permissions/getIsAdmin']) {
       next({ name: to.meta?.hasPreviousView || 'listEvents' })
-    } else if (await window.$vue.$store.dispatch('permissions/verifyPermission', to)) {
+    } else if (await window.$vue.$store.dispatch('permissions/verifyRoutePermission', to)) {
       window.$vue.$store.dispatch('setNavBarConfig', to);
       next();
     }

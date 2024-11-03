@@ -52,6 +52,13 @@
         value="createEvents"
         @click="goTo('createEvents')"
       />
+      <v-list-item
+        v-if="verifyPermission({ module: 'knowledge-areas', permission: 'create' })"
+        prepend-icon="mdi-atom-variant"
+        title="Cadastrar Área do Conhecimento"
+        value="createKnowledgeArea"
+        @click="goTo('createKnowledgeArea')"
+      />
 
       <!-- <v-list-group value="Cadastro">
         <template
