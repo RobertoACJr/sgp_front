@@ -15,7 +15,7 @@
     "roboto-fontface": "*",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
-    "vuetify": "^3.0.0-beta.0",
+    "vuetify": "^3.6.14",
     "vuex": "^4.0.0",
     "webfontloader": "^1.0.0"
   },
@@ -49,7 +49,7 @@
       "parser": "@babel/eslint-parser"
     },
     "rules": {
-      "no-debugger":"off",
+      "no-debugger": "off",
       "vue/multi-word-component-names": "off"
     }
   },
