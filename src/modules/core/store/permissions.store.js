@@ -18,13 +18,16 @@ export default {
     },
   },
   actions: {
-    verifyPermission({ getters }, to) {
-      if (to.meta?.permission) {
-        return Boolean(Object.keys(getters.getPermissions?.length)) &&
-          getters.getPermissions[to.meta.mainModule] &&
-          Boolean(getters.getPermissions[to.meta.mainModule].includes(to.meta.permission))
-      }
-      return true;
+    verifyPermission ({ getters }, { permission, module }) {
+      return Boolean(Object.keys(getters.getPermissions?.length || 0)) &&
+        getters.getPermissions[module] &&
+        Boolean(getters.getPermissions[module].includes(permission))
+    },
+    verifyRoutePermission ({ dispatch }, to) {
+      return !to.meta?.permission || dispatch('verifyPermission', {
+        permission: to.meta.permission,
+        module: to.meta.mainModule
+      })
     },
   },
 }

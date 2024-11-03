@@ -1,4 +1,5 @@
 import * as evaluationApi from '@/modules/evaluations/api/evaluations.js';
+import { errorToast } from '@/modules/core/helpers/toastHelper';
 
 export const startEvaluation = async params => {
   try {
@@ -6,8 +7,7 @@ export const startEvaluation = async params => {
     return data;
   } catch (error) {
     console.error(error);
-    window.$vue.$store.dispatch("setToastConfig", {
-      status: "error",
+    errorToast({
       title: "Falha ao iniciar avaliação do Projeto",
       text: error.response.data.message || "",
     })
@@ -21,8 +21,7 @@ export const changeEvaluationStatus = async params => {
     return data;
   } catch (error) {
     console.error(error);
-    window.$vue.$store.dispatch("setToastConfig", {
-      status: "error",
+    errorToast({
       title: "Falha mudar status da avaliação",
       text: error.response.data.message || "",
     })

@@ -45,6 +45,13 @@
         value="listEvents"
         @click="goTo('listEvents')"
       />
+      <v-list-item
+        v-if="verifyPermission({ module: 'events', permission: 'create' })"
+        prepend-icon="mdi-arrange-bring-to-front"
+        title="Cadastrar Evento"
+        value="createEvents"
+        @click="goTo('createEvents')"
+      />
 
       <!-- <v-list-group value="Cadastro">
         <template
@@ -81,7 +88,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 
 export default {
   name: "NavBar",
@@ -104,6 +111,9 @@ export default {
   },
 
   methods: {
+    ...mapActions('permissions', [
+      'verifyPermission'
+    ]),
     ...mapMutations('auth', [
       'reset',
     ]),
@@ -113,7 +123,7 @@ export default {
     logout() {
       this.reset();
       this.$router.push({ name: "login" });
-    }
+    },
   },
 
 }

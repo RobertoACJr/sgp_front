@@ -1,4 +1,5 @@
 import * as authApi from '@/modules/core/api/auth.js';
+import { errorToast } from '@/modules/core/helpers/toastHelper';
 
 export const login = async payload => {
   try {
@@ -7,10 +8,9 @@ export const login = async payload => {
     return data;
   } catch (error) {
     console.error(error);
-    window.$vue.$store.dispatch("setToastConfig", {
-      status: "error",
+    errorToast({
       title: "Falha ao fazer Login",
-      text: error?.response?.data?.message || "Falha ao Avaliar Projeto",
+      text: error?.response?.data?.message || "",
     })
     throw error;
   }

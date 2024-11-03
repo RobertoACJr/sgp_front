@@ -7,3 +7,7 @@ export const list = async (params) => {
 export const getEventPermissions = async (payload) => {
   return axios.post('event/savePermissions', payload)
 }
+
+export const create = async (payload) => {
+  return axios.post('event', payload);
+}
