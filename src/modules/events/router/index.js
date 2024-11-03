@@ -1,5 +1,6 @@
 import ShowEvent from '@/modules/events/Show.vue'
 import ListEvents from '@/modules/events/List.vue'
+import CreateEvents from '@/modules/events/Create.vue'
 
 export default [
   {
@@ -19,6 +20,18 @@ export default [
       needsAuthentication: true,
       hasNavBar: true,
       hasPreviousView: 'listEvents',
+    }
+  },
+  {
+    path: '/event/create',
+    name: 'createEvents',
+    component: CreateEvents,
+    meta: {
+      needsAuthentication: true,
+      hasNavBar: true,
+      hasPreviousView: 'listEvents',
+      mainModule: "events",
+      permission: "create",
     }
   }
 ]

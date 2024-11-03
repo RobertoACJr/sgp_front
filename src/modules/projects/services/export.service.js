@@ -1,4 +1,5 @@
 import * as exportApi from '@/modules/projects/api/export.js';
+import { errorToast } from '@/modules/core/helpers/toastHelper';
 
 export const exportProjectsRanking = async () => {
   try {
@@ -6,8 +7,7 @@ export const exportProjectsRanking = async () => {
     return data;
   } catch (error) {
     console.error(error);
-    window.$vue.$store.dispatch("setToastConfig", {
-      status: "error",
+    errorToast({
       title: "Falha ao exportar Projetos",
       text: error.response.data.message || "",
     })
@@ -21,8 +21,7 @@ export const exportEvaluators = async () => {
     return data;
   } catch (error) {
     console.error(error);
-    window.$vue.$store.dispatch("setToastConfig", {
-      status: "error",
+    errorToast({
       title: "Falha ao exportar as informações dos avaliadores",
       text: error.response.data.message || "",
     })
