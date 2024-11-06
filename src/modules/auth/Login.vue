@@ -38,7 +38,6 @@
 
       <v-btn
         block
-        class="mb-8"
         color="primary"
         size="large"
         variant="tonal"
@@ -47,24 +46,23 @@
         Log In
       </v-btn>
 
-      <!-- <v-card-text class="text-center">
-        <a
+      <v-card-text class="text-center">
+        <button
           class="text-blue text-decoration-none"
           href="#"
           rel="noopener noreferrer"
-          target="_blank"
+          @click="goToSignUp"
         >
-          // TODO: aqui ficará o redirecionamento para cadastro, ainda a implementar
           Cadastre-se agora <v-icon icon="mdi-chevron-right" />
-        </a>
-      </v-card-text> -->
+        </button>
+      </v-card-text>
     </v-card>
   </v-container>
 </template>
 
 <script>
 import useVuelidate from '@vuelidate/core';
-import * as authService from '@/modules/core/services/auth.service.js';
+import * as authService from '@/modules/auth/services/auth.service.js';
 
 import { reactive } from 'vue';
 import { required, email, minLength } from '@vuelidate/validators';
@@ -132,6 +130,9 @@ export default {
           this.loading = false;
         })
     },
+    goToSignUp() {
+      this.$router.push({ name: 'signUp' })
+    }
   },
 }
 </script>

@@ -45,6 +45,7 @@
         value="listEvents"
         @click="goTo('listEvents')"
       />
+
       <v-list-item
         v-if="verifyPermission({ module: 'events', permission: 'create' })"
         prepend-icon="mdi-arrange-bring-to-front"
@@ -52,12 +53,21 @@
         value="createEvents"
         @click="goTo('createEvents')"
       />
+
       <v-list-item
         v-if="verifyPermission({ module: 'knowledge-areas', permission: 'create' })"
         prepend-icon="mdi-atom-variant"
         title="Cadastrar Área do Conhecimento"
         value="createKnowledgeArea"
         @click="goTo('createKnowledgeArea')"
+      />
+
+      <v-list-item
+        v-if="verifyPermission({ module: 'users', permission: 'list' })"
+        prepend-icon="mdi-draw"
+        title="Gestão de Avaliadores"
+        value="listEvaluators"
+        @click="goTo('listEvaluators')"
       />
 
       <!-- <v-list-group value="Cadastro">

@@ -1,0 +1,319 @@
+<template>
+  <v-container>
+    <div
+      class="d-flex justify-space-between"
+    >
+      <div
+        class="text-h6 heading-6 mb-5"
+      >
+        Lista de Avaliadores
+      </div>
+      <div>
+        <!-- <v-btn
+          icon
+          class="mr-3"
+          :disabled="loading"
+          title="Exportar Informações dos Avaliadores"
+          @click="exportEvaluators"
+        >
+          <v-icon
+            color="primary"
+          >
+            mdi-account-circle-outline
+          </v-icon>
+        </v-btn> -->
+        <v-btn
+          icon
+          title="Recarregar Listagem"
+          :disabled="loading"
+          @click="getEvaluatorsByPage()"
+        >
+          <v-icon
+            color="secondary"
+          >
+            mdi-sync
+          </v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          title="Filtrar resultados"
+          class="ml-3"
+          :disabled="loading"
+          @click="() => isFiltersModalOpen = true"
+        >
+          <v-icon
+            :color="hasFilters ? 'primary' : 'secondary'"
+          >
+            mdi-filter-outline
+          </v-icon>
+        </v-btn>
+        <v-btn
+          v-if="verifyPermission({ module: 'users', permission: 'create' })"
+          icon
+          title="Criar Avaliador"
+          class="ml-3"
+          :disabled="loading"
+          @click="goTo('createEvaluator')"
+        >
+          <v-icon color="primary">
+            mdi-plus
+          </v-icon>
+        </v-btn>
+      </div>
+    </div>
+    <loading v-if="loading" />
+    <div
+      v-else-if="!getEvaluators.length"
+      class="no-content"
+    >
+      Nenhum Avaliador Cadastrado
+    </div>
+    <v-row v-else>
+      <v-col
+        v-if="hasFilters"
+        md="12"
+        sm="12"
+      >
+        <p>Avaliadores encontrados: {{ getFilteredEvaluators.length }}</p>
+        <div class="d-flex flex-wrap mt-5">
+          Filtros:
+          <div
+            v-for="(filter, index) in filters"
+            :key="index"
+            class="mr-2 mb-2 filter-pill"
+          >
+            {{ filter.title }}
+            <v-icon
+              color="tertiary"
+              @click="removeFilter(filter)"
+            >
+              mdi-alpha-x-circle-outline
+            </v-icon>
+          </div>
+        </div>
+      </v-col>
+      <v-col
+        v-if="!getFilteredEvaluators.length"
+        md="12"
+        sm="12"
+        class="mt-5"
+      >
+        Nenhum Avaliador Para os filtros selecionados
+      </v-col>
+      <v-col
+        v-else
+        md="12"
+        sm="12"
+        class="mt-5"
+      >
+        <v-table
+          fixed-header
+          height="75vh"
+        >
+          <thead>
+            <tr>
+              <th class="text-left">
+                Nome
+              </th>
+              <th class="text-center">
+                E-mail
+              </th>
+              <th class="text-center">
+                Áreas do Conhecimento
+              </th>
+              <th class="text-center">
+                Tipo
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(evaluator, index) in getFilteredEvaluators"
+              :key="index"
+            >
+              <!-- @click="goToEvaluator(evaluator)" -->
+              <td class="text-body-2">
+                {{ evaluator.name }}
+              </td>
+              <td class="text-body-2">
+                {{ evaluator.email }}
+              </td>
+              <td class="text-body-2 text-center">
+                {{ evaluator.knowledge_areas.join(', ') }}
+              </td>
+              <td class="text-body-2 text-center">
+                {{ evaluator.role?.name || "--" }}
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </v-col>
+      <v-col
+        v-if="getLenghtOfPages > 1"
+        md="12"
+      >
+        <v-pagination
+          v-model="currentPage"
+          :length="getLenghtOfPages"
+          rounded="circle"
+          @update:model-value="getEvaluatorsByPage"
+        />
+      </v-col>
+    </v-row>
+  </v-container>
+  <!-- <ModalFilters
+    :is-open="isFiltersModalOpen"
+    @set-filters="(newFilters) => filters = newFilters"
+    @close="() => isFiltersModalOpen = false"
+  /> -->
+</template>
+
+<script>
+import { defineComponent } from 'vue';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
+
+// import ModalFilters from '@/modules/evaluators/components/ModalFilters.vue';
+
+import * as evaluatorService from '@/modules/evaluator/services/evaluator.service';
+
+export default defineComponent({
+  name: 'ListEvaluators',
+  components: {
+    // ModalFilters,
+  },
+  data: () => ({
+    loading: false,
+    filters: [],
+    isFiltersModalOpen: false,
+  }),
+  computed: {
+    ...mapGetters('permissions', [
+      'getIsAdmin',
+    ]),
+    ...mapGetters('evaluator', [
+      'getEvaluators',
+      'getFetchEvaluatorsList',
+      'getCurrentPage',
+      'getLenghtOfPages',
+      'getCategoryFilter',
+      'getTeachingLevelFilter',
+      'getKnowledgeAreaFilter',
+    ]),
+    currentPage: {
+      get() {
+        return this.getCurrentPage;
+      },
+      set(value) {
+        this.setCurrentPage(value);
+      }
+    },
+    hasFilters() {
+      return Boolean(
+        this.getCategoryFilter?.length ||
+        this.getTeachingLevelFilter?.length ||
+        this.getKnowledgeAreaFilter?.length
+      );
+    },
+    getFilteredEvaluators() {
+      return this.getEvaluators.filter(evaluator => {
+        return this.evaluatorHasFilteredCategory(evaluator.category) &&
+          this.evaluatorHasFilteredKnoledgeArea(evaluator.knowledge_area) &&
+          this.evaluatorHasFilteredTeachingLevel(evaluator.teaching_level)
+      })
+    },
+  },
+  mounted() {
+    this.getFetchEvaluatorsList && this.getEvaluatorsByPage();
+    this.filters = [
+      ...this.getCategoryFilter ? this.getCategoryFilter.map(f => ({ title: f, type: 'category' })) : [],
+      ...this.getTeachingLevelFilter ? this.getTeachingLevelFilter.map(f => ({ title: f, type: 'teaching_level' })) : [],
+      ...this.getKnowledgeAreaFilter ? this.getKnowledgeAreaFilter.map(f => ({ title: f, type: 'knowledge_area' })) : [],
+    ]
+    this.setFetchEvaluator(true);
+  },
+  methods: {
+    ...mapActions('permissions', [
+      'verifyPermission'
+    ]),
+    ...mapMutations('evaluator', [
+      'setEvaluators',
+      'setCurrentPage',
+      'setLenghtOfPages',
+      'setCurrentEvaluator',
+      'setFetchEvaluator',
+      'setFetchEvaluatorsList',
+      'setCategoryFilter',
+      'setTeachingLevelFilter',
+      'setKnowledgeAreaFilter',
+    ]),
+    goToEvaluator (evaluator) {
+      this.setCurrentEvaluator(evaluator);
+      this.goTo('showEvaluator')
+    },
+    goTo(name) {
+      this.$router.push({ name });
+    },
+    getEvaluatorsByPage () {
+      this.loading = true;
+      let params = {
+        page: this.getCurrentPage,
+        perPage: 100,
+      };
+      evaluatorService.list(params)
+        .then((response) => {
+          this.setEvaluators(response.data);
+          this.loading = false;
+          this.setLenghtOfPages(response?.meta?.pages || 1);
+          this.setFetchEvaluatorsList(false);
+        })
+        .catch(() => {
+          this.loading = false;
+        })
+    },
+    evaluatorHasFilteredCategory (category) {
+      return !this.getCategoryFilter || !this.getCategoryFilter.length || this.getCategoryFilter.includes(category);
+    },
+    evaluatorHasFilteredTeachingLevel (teachingLevel) {
+      return !this.getTeachingLevelFilter || !this.getTeachingLevelFilter.length || this.getTeachingLevelFilter.includes(teachingLevel);
+    },
+    evaluatorHasFilteredKnoledgeArea (knowledgeArea) {
+      return !this.getKnowledgeAreaFilter || !this.getKnowledgeAreaFilter.length || this.getKnowledgeAreaFilter.includes(knowledgeArea);
+    },
+    removeFilter(filter) {
+      if (filter.type == 'category') {
+        this.setCategoryFilter(this.getCategoryFilter.filter(f => f != filter.title));
+      }
+      if (filter.type == 'teaching_level') {
+        this.setTeachingLevelFilter(this.getTeachingLevelFilter.filter(f => f != filter.title));
+      }
+      if (filter.type == 'knowledge_area') {
+        this.setKnowledgeAreaFilter(this.getKnowledgeAreaFilter.filter(f => f != filter.title));
+      }
+      this.filters = this.filters.filter(f => f != filter);
+    }
+  },
+});
+</script>
+
+<style lang="scss" scoped>
+td, th {
+  color: rgb(var(--v-theme-primary));
+}
+td {
+  cursor: pointer;
+}
+tr:hover {
+  background-color: rgb(var(--v-theme-light_primary));
+}
+.filter-pill {
+  border: solid 1px rgb(var(--v-theme-secondary));
+  border-radius: 12px;
+  padding: 4px 8px;
+  color: rgb(var(--v-theme-secondary));
+  background-color: rgb(var(--v-theme-secondary), 0.05);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+}
+</style>

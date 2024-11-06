@@ -11,6 +11,19 @@ export const list = async params => {
   }
 }
 
+export const listOptions = async params => {
+  try {
+    const { data } = await list(params);
+    return data.map(({ id, prefix, description }) => ({
+      title: `${prefix} - ${description}`,
+      value: id
+    }));
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 export const create = async params => {
   try {
     const { data } = await knowledgeAreaApi.create(params);
