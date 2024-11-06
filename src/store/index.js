@@ -1,8 +1,8 @@
 import { createStore } from 'vuex'
-import auth from '@/modules/core/store/auth.store.js';
+import auth from '@/modules/auth/store/auth.store.js';
 import toast from '@/modules/core/store/toast.store.js';
 import events from '@/modules/events/store/events.store.js';
-import knowledgeArea from '@/modules/knowledgeArea/store/knowledgeArea.store.js';
+import evaluator from '@/modules/evaluator/store/evaluator.store.js';
 import permissions from '@/modules/core/store/permissions.store.js';
 import projects from '@/modules/projects/store/projects.store.js';
 
@@ -47,7 +47,7 @@ const store = createStore({
     auth,
     toast,
     events,
-    knowledgeArea,
+    evaluator,
     permissions,
     projects,
   }

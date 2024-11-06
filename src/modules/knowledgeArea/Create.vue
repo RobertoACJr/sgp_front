@@ -119,9 +119,10 @@ export default {
     async handleSaveKnowledgeArea() {
       this.v$.$touch()
       if (this.v$.$invalid) return;
-      await this.saveKnowledgeAres();
+      await this.saveKnowledgeArea();
+        this.$router.push({ name: "listEvents" }) //TODO mudar para lista de areas do co
     },
-    async saveKnowledgeAres () {
+    async saveKnowledgeArea () {
       try {
         this.loading = true;
         await knowledgeAreaService.create(this.getParams);

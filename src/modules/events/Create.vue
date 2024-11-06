@@ -156,6 +156,7 @@ export default {
       try {
         this.loading = true;
         await eventsService.create(this.getParams);
+        this.$router.push({ name: "listEvents" })
       } finally {
         this.loading = false;
       }
