@@ -8,11 +8,13 @@
     </v-main>
   </v-app>
   <Toast />
+  <ModalChangePassword />
 </template>
 
 <script>
 import Toast from '@/modules/core/components/Toast.vue';
 import NavBar from '@/modules/core/components/NavBar.vue';
+import ModalChangePassword from '@/modules/auth/ModalChangePassword.vue'
 import { mapMutations } from 'vuex';
 
 export default {
@@ -21,6 +23,7 @@ export default {
   components: {
     Toast,
     NavBar,
+    ModalChangePassword,
   },
 
   mounted() {

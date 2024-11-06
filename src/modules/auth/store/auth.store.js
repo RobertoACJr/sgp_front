@@ -9,6 +9,7 @@ export default {
   getters: {
     getToken: state => state.token,
     getUser: state => state?.user,
+    getUserIsUsingTemporaryPassword: state => state?.user?.temporary_password,
     getUserUuid: state => state?.user?.uuid,
   },
   mutations: {
@@ -18,8 +19,11 @@ export default {
     setToken (state, token) {
       state.token = token;
     },
-    setUser(state, user) {
+    setUser (state, user) {
       state.user = user;
+    },
+    setUserIsUsingTemporaryPassword (state, isUsing) {
+      state.user.temporary_password = isUsing;
     },
   },
   actions: {
