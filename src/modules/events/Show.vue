@@ -39,7 +39,7 @@ import { mapGetters } from 'vuex';
 export default defineComponent({
   name: 'ShowEvent',
   data: () => ({
-    loading: true,
+    loading: false,
   }),
   computed: {
     ...mapGetters("events", [

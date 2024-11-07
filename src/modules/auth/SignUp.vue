@@ -12,7 +12,7 @@
     />
     <v-card
       v-else
-      class="mx-auto pa-12 pb-8 create-evaluator-container__card"
+      class="mx-auto pa-6 pb-8 create-evaluator-container__card"
       elevation="8"
       rounded="lg"
     >
@@ -69,18 +69,16 @@
         </v-col>
 
         <v-col
+          v-if="getKnowledgeAreas.length"
           cols="12"
           lg="6"
         >
           <v-select
-            v-if="!loadingKnowledgeArea"
             v-model="knowledgeArea"
-            :items="knowledgeAreaOptions"
+            :items="getKnowledgeAreas"
             label="Áreas do Conhecimento"
             placeholder="Escolha ao menos uma área"
-            chips
             multiple
-            return-object
             :error-messages="getKnowledgeAreaErrors"
           />
         </v-col>
@@ -146,12 +144,12 @@
 <script>
 import useVuelidate from '@vuelidate/core';
 import * as authService from '@/modules/auth/services/auth.service.js';
-import * as knowledgeAreaService from '@/modules/knowledgeArea/services/knowledgeArea.service.js';
 
 import { reactive, computed } from 'vue';
 import { required, email, minLength, sameAs } from '@vuelidate/validators';
 import { validateCpf, validateFullName } from '@/modules/core/validations';
 import { formatCpf, formatContact } from '@/modules/core/masks';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'CreateEvaluator',
@@ -200,13 +198,14 @@ export default {
   data: () => ({
     requiredMessage: "O campo é obrigatório 😿",
     loading: false,
-    loadingKnowledgeArea: false,
     showPassword: false,
     showVerifyPassword: false,
-    knowledgeAreaOptions: [],
   }),
 
   computed: {
+    ...mapGetters('knowledgeArea', [
+      'getKnowledgeAreas'
+    ]),
     name: {
       get () {
         return this.state.name;
@@ -327,10 +326,13 @@ export default {
   },
 
   mounted() {
-    this.getKnowledgeAreasOptions();
+    this.fetchKnowledgeAreaOptionsIfNecessary();
   },
 
   methods: {
+    ...mapActions('knowledgeArea', [
+      'fetchKnowledgeAreaOptionsIfNecessary'
+    ]),
     async handleSaveEvaluator() {
       this.v$.$touch()
       if (this.v$.$invalid) return;
@@ -343,15 +345,6 @@ export default {
         this.goToSignIn();
       } finally {
         this.loading = false;
-      }
-    },
-    async getKnowledgeAreasOptions () {
-      try {
-        this.loadingKnowledgeArea = true;
-        const options = await knowledgeAreaService.listOptions();
-        this.knowledgeAreaOptions = options;
-      } finally {
-        this.loadingKnowledgeArea = false;
       }
     },
     goToSignIn() {

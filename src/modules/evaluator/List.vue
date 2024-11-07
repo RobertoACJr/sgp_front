@@ -120,8 +120,8 @@
             <tr
               v-for="(evaluator, index) in getFilteredEvaluators"
               :key="index"
+              @click="goToEvaluator(evaluator)"
             >
-              <!-- @click="goToEvaluator(evaluator)" -->
               <td class="text-body-2">
                 {{ evaluator.name }}
               </td>
@@ -146,12 +146,12 @@
         </v-table>
       </v-col>
       <v-col
-        v-if="getLenghtOfPages > 1"
+        v-if="getLengthOfPages > 1"
         md="12"
       >
         <v-pagination
           v-model="currentPage"
-          :length="getLenghtOfPages"
+          :length="getLengthOfPages"
           rounded="circle"
           @update:model-value="getEvaluatorsByPage"
         />
@@ -192,7 +192,7 @@ export default defineComponent({
       'getEvaluators',
       'getFetchEvaluatorsList',
       'getCurrentPage',
-      'getLenghtOfPages',
+      'getLengthOfPages',
       'getCategoryFilter',
       'getTeachingLevelFilter',
       'getKnowledgeAreaFilter',
@@ -233,7 +233,7 @@ export default defineComponent({
     ...mapMutations('evaluator', [
       'setEvaluators',
       'setCurrentPage',
-      'setLenghtOfPages',
+      'setLengthOfPages',
       'setCurrentEvaluator',
       'setFetchEvaluator',
       'setFetchEvaluatorsList',
@@ -259,7 +259,7 @@ export default defineComponent({
         .then((response) => {
           this.setEvaluators(response.data);
           this.loading = false;
-          this.setLenghtOfPages(response?.meta?.pages || 1);
+          this.setLengthOfPages(response?.meta?.pages || 1);
           this.setFetchEvaluatorsList(false);
         })
         .catch(() => {

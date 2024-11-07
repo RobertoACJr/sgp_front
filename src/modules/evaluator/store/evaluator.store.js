@@ -18,7 +18,7 @@ export default {
     getEvaluators: state => state.evaluators,
     getCurrentEvaluator: state => state.currentEvaluator,
     getCurrentPage: state => state.currentPage,
-    getLenghtOfPages: state => state.lengthOfPages,
+    getLengthOfPages: state => state.lengthOfPages,
     getCurrentEvaluatorEvaluationIndex: state => state.currentEvaluatorEvaluationIndex,
     getFetchEvaluator: state => state.fetchEvaluator,
     getFetchEvaluatorsList: state => state.fetchEvaluatorsList,
@@ -42,7 +42,7 @@ export default {
     setCurrentPage (state, currentPage) {
       state.currentPage = currentPage;
     },
-    setLenghtOfPages (state, lengthOfPages) {
+    setLengthOfPages (state, lengthOfPages) {
       state.lengthOfPages = lengthOfPages;
     },
     setFetchEvaluator(state, fetch) {

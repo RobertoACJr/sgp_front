@@ -18,7 +18,7 @@ export default {
     getProjects: state => state.projects,
     getCurrentProject: state => state.currentProject,
     getCurrentPage: state => state.currentPage,
-    getLenghtOfPages: state => state.lengthOfPages,
+    getLengthOfPages: state => state.lengthOfPages,
     getCurrentProjectEvaluationIndex: state => state.currentProjectEvaluationIndex,
     getFetchProject: state => state.fetchProject,
     getFetchProjectsList: state => state.fetchProjectsList,
@@ -42,7 +42,7 @@ export default {
     setCurrentPage (state, currentPage) {
       state.currentPage = currentPage;
     },
-    setLenghtOfPages (state, lengthOfPages) {
+    setLengthOfPages (state, lengthOfPages) {
       state.lengthOfPages = lengthOfPages;
     },
     setFetchProject(state, fetch) {

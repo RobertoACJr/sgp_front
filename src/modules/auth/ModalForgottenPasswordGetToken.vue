@@ -15,7 +15,6 @@
           <v-row>
             <v-col
               cols="12"
-              lg="6"
             >
               Digite o E-mail relacionado à conta
               <v-text-field
