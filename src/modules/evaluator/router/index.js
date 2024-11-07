@@ -1,5 +1,6 @@
 import createEvaluator from '@/modules/evaluator/Create.vue'
 import listEvaluators from '@/modules/evaluator/List.vue'
+import showEvaluator from '@/modules/evaluator/Show.vue'
 
 export default [
   {
@@ -24,6 +25,18 @@ export default [
       mainModule: "users",
       permission: "list",
       hasPreviousView: 'listEvents',
+    }
+  },
+  {
+    path: '/evaluator/info',
+    name: 'showEvaluator',
+    component: showEvaluator,
+    meta: {
+      needsAuthentication: true,
+      hasNavBar: true,
+      mainModule: "users",
+      permission: "list", // TODO show
+      hasPreviousView: 'listEvaluators',
     }
   }
 ]
