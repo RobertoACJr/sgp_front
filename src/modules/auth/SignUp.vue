@@ -145,10 +145,10 @@
 
 <script>
 import useVuelidate from '@vuelidate/core';
-import * as evaluatorService from '@/modules/evaluator/services/evaluator.service.js';
+import * as authService from '@/modules/auth/services/auth.service.js';
 import * as knowledgeAreaService from '@/modules/knowledgeArea/services/knowledgeArea.service.js';
 
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import { required, email, minLength, sameAs } from '@vuelidate/validators';
 import { validateCpf, validateFullName } from '@/modules/core/validations';
 import { formatCpf, formatContact } from '@/modules/core/masks';
@@ -165,6 +165,9 @@ export default {
       verifyPassword: '',
       knowledgeArea: []
     })
+    
+    const password = computed(() => state.password);
+
     const rules = {
       name: {
         required,
@@ -185,7 +188,7 @@ export default {
       },
       verifyPassword: {
         required,
-        sameAs: sameAs(state.password)
+        sameAs: sameAs(password)
       },
       knowledgeArea: { required },
     }
@@ -266,21 +269,21 @@ export default {
       const errors = [];
       if (!this.v$.$dirty) return;
       this.v$.name.required.$invalid && errors.push(this.requiredMessage);
-      this.v$.name.fullName.$invalid && errors.push('Algo de errado num ta certo 😿');
+      this.v$.name.fullName.$invalid && errors.push('Preencha com nome e sobrenome');
       return errors;
     },
     getEmailErrors () {
       const errors = [];
       if (!this.v$.$dirty) return;
       this.v$.email.required.$invalid && errors.push(this.requiredMessage);
-      this.v$.email.email.$invalid && errors.push('Algo de errado num ta certo 😿');
+      this.v$.email.email.$invalid && errors.push('E-mail inválido');
       return errors;
     },
     getContactErrors () {
       const errors = [];
       if (!this.v$.$dirty) return;
       this.v$.contact.required.$invalid && errors.push(this.requiredMessage);
-      this.v$.contact.length.$invalid && errors.push('Algo de errado num ta certo 😿');
+      this.v$.contact.length.$invalid && errors.push('Telefone inválido');
       return errors;
     },
     getDocumentErrors () {
@@ -294,7 +297,7 @@ export default {
       const errors = [];
       if (!this.v$.$dirty) return;
       this.v$.password.required.$invalid && errors.push(this.requiredMessage);
-      this.v$.password.min.$invalid && errors.push("Senha muito pitica");
+      this.v$.password.min.$invalid && errors.push("Mínimo de seis caracteres");
       return errors;
     },
     getVerifyPasswordErrors () {
@@ -317,6 +320,7 @@ export default {
         contact: this.contact,
         document: this.document,
         password: this.password,
+        confirm_password: this.verifyPassword,
         knowledge_areas: this.knowledgeArea.map(({ value }) => { return value }),
       }
     },
@@ -335,8 +339,8 @@ export default {
     async saveEvaluator () {
       try {
         this.loading = true;
-        await evaluatorService.create(this.getParams);
-        this.$router.push({ name: "listEvents" }) //TODO mudar para lista de avaliadores
+        await authService.signUp(this.getParams);
+        this.goToSignIn();
       } finally {
         this.loading = false;
       }

@@ -46,14 +46,20 @@ const handleNext = (next, to) => {
   next();
 }
 
+const handleRouteNotAllowed = () => {
+  setToast("Acesso não permitido")
+}
+
 const handleForceNextToOtherPage = (next, name) => {
+  handleRouteNotAllowed()
   next({ name })
 }
 
-const handleRouteNotAllowed = (to) => {
+const isOnlyForAdmin = (to, next) => {
+  const PREVIOUS_PAGE = to.meta?.hasPreviousView || "listEvents"
   const isAdmin = window.$vue.$store.getters["permissions/getIsAdmin"]
-  if (isAdmin && to.meta?.onlyForAdmin) {
-    setToast("Acesso não permitido")
+  if (!isAdmin && to.meta?.onlyForAdmin) {
+    handleForceNextToOtherPage(next, PREVIOUS_PAGE)
     return true
   }
   return false
@@ -63,17 +69,17 @@ const isSigned = () => {
   return window.$vue.$store.dispatch("auth/isSigned")
 }
 
-const hasPermission = (to) => {
-  return window.$vue.$store.dispatch("permissions/verifyRoutePermission", to)
+const hasPermission = async (to) => {
+  return await window.$vue.$store.dispatch("permissions/verifyRoutePermission", to)
 }
 
 router.beforeEach(async (to, from, next) => {
   try {
     if (isSigned()) {
-      const previousPage = to.meta?.hasPreviousView || "listEvents"
-      if (handleRouteNotAllowed(to)) return handleForceNextToOtherPage(next, previousPage)
+      if (isOnlyForAdmin(to, next)) return
 
-      if (!hasPermission(to)) return handleForceNextToOtherPage(next, "listEvents")
+      const HAS_PERMISSION = await hasPermission(to)
+      if (!HAS_PERMISSION) return handleForceNextToOtherPage(next, "listEvents")
 
       handleNext(next, to)
     } else if (!to.needsAuthentication) {

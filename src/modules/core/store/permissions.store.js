@@ -8,6 +8,12 @@ export default {
     getPermissions: state => state.permissions,
     getRole: state => state.role,
     getIsAdmin: state => state.role?.is_admin,
+    verifyPermission: (state) => ({ module, permission }) => {
+      const HAS_PERMISSIONS = Boolean(Object.keys(state.permissions)?.length || 0)
+      const HAS_PERMISSION_TO_MODULE = state.permissions[module] &&
+        Boolean(state.permissions[module].includes(permission))
+      return HAS_PERMISSIONS && HAS_PERMISSION_TO_MODULE
+    },
   },
   mutations: {
     setPermissions(state, permissions) {
@@ -18,16 +24,12 @@ export default {
     },
   },
   actions: {
-    verifyPermission ({ getters }, { permission, module }) {
-      return Boolean(Object.keys(getters.getPermissions?.length || 0)) &&
-        getters.getPermissions[module] &&
-        Boolean(getters.getPermissions[module].includes(permission))
-    },
-    verifyRoutePermission ({ dispatch }, to) {
-      return !to.meta?.permission || dispatch('verifyPermission', {
-        permission: to.meta.permission,
-        module: to.meta.mainModule
-      })
+    verifyRoutePermission ({ getters }, to) {
+      return !to.meta?.permission ||
+        getters.verifyPermission({
+          permission: to.meta.permission,
+          module: to.meta.mainModule
+        })
     },
   },
 }

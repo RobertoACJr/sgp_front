@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: "NavBar",
@@ -123,14 +123,12 @@ export default {
       'getUser',
     ]),
     ...mapGetters('permissions', [
+      'verifyPermission',
       'getIsAdmin',
     ]),
   },
 
   methods: {
-    ...mapActions('permissions', [
-      'verifyPermission'
-    ]),
     ...mapMutations('auth', [
       'reset',
     ]),
@@ -149,5 +147,9 @@ export default {
 <style lang="scss" scoped>
 .user-name {
   margin-right: 10px;
+}
+
+.hide {
+  display: none;
 }
 </style>

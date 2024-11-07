@@ -34,9 +34,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { mapGetters, mapMutations } from 'vuex';
-
-import * as eventsService from '@/modules/events/services/events.service.js';
+import { mapGetters } from 'vuex';
 
 export default defineComponent({
   name: 'ShowEvent',
@@ -47,30 +45,6 @@ export default defineComponent({
     ...mapGetters("events", [
       "getCurrentEvent",
     ]),
-  },
-  mounted() {
-    this.getEventPermissions();
-  },
-  methods: {
-    ...mapMutations("permissions", [
-      "setPermissions",
-      "setRole"
-    ]),
-
-    getEventPermissions() {
-      eventsService.getEventPermissions({
-        event_uuid: this.getCurrentEvent.value,
-      })
-        .then(({ data }) => {
-          this.setPermissions(data.permissions);
-          this.setRole(data.role);
-          this.$router.push({ name: "listProjects" });
-        })
-        .catch(() => {
-          // TODO
-          // algum tratamento
-        })
-    },
   },
 });
 </script>
