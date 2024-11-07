@@ -32,18 +32,11 @@
               multiple
             />
             <v-select
-              v-if="!loadingKnowledgeArea"
               v-model="knowledgeArea"
               clearable
               chips
               label="Áreas do conhecimento"
-              :items="[
-                'Ciências Biológicas e da Saúde',
-                'Ciências Exatas e da Terra',
-                'Ciências Humanas, Sociais Aplicadas e Linguística e Artes',
-                'Ciências Agrárias e Engenharias',
-                'Multidisciplinar'
-              ]"
+              :items="getKnowledgeAreas"
               multiple
             />
           </v-card-text>
@@ -83,7 +76,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 export default {
   name: "ModalValidateProjectCode",
   props: {
@@ -108,6 +101,9 @@ export default {
       'getTeachingLevelFilter',
       'getKnowledgeAreaFilter',
     ]),
+    ...mapGetters('knowledgeArea', [
+      'getKnowledgeAreas',
+    ]),
     isModalOpen: {
       get() {
         return this.isOpen;
@@ -118,6 +114,7 @@ export default {
     },
   },
   mounted() {
+    this.fetchKnowledgeAreaOptionsIfNecessary()
     this.category = this.getCategoryFilter;
     this.teachingLevel = this.getTeachingLevelFilter;
     this.knowledgeArea = this.getKnowledgeAreaFilter;
@@ -126,6 +123,9 @@ export default {
     ...mapMutations('projects', [
       'setFilters',
       'resetFilters',
+    ]),
+    ...mapActions('knowledgeArea', [
+      'fetchKnowledgeAreaOptionsIfNecessary',
     ]),
     closeModal() {
       this.showInvalidCodeWarning = false;

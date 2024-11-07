@@ -5,6 +5,7 @@ import events from '@/modules/events/store/events.store.js';
 import evaluator from '@/modules/evaluator/store/evaluator.store.js';
 import permissions from '@/modules/core/store/permissions.store.js';
 import projects from '@/modules/projects/store/projects.store.js';
+import knowledgeArea from '@/modules/knowledgeArea/store/knowledgeArea.store.js';
 
 const store = createStore({
   state: {
@@ -50,6 +51,7 @@ const store = createStore({
     evaluator,
     permissions,
     projects,
+    knowledgeArea,
   }
 })
 

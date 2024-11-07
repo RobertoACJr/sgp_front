@@ -12,7 +12,7 @@
     />
     <v-card
       v-else
-      class="mx-auto pa-12 pb-8 create-knowledge-area-container__card"
+      class="mx-auto pa-6 pb-8 create-knowledge-area-container__card"
       elevation="8"
       rounded="lg"
     >

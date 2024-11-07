@@ -16,7 +16,6 @@
           <v-row>
             <v-col
               cols="12"
-              lg="6"
             >
               <v-text-field
                 v-model="password"
@@ -30,7 +29,6 @@
 
             <v-col
               cols="12"
-              lg="6"
             >
               <v-text-field
                 v-model="verifyPassword"

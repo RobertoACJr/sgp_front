@@ -152,12 +152,12 @@
         </v-table>
       </v-col>
       <v-col
-        v-if="getLenghtOfPages > 1"
+        v-if="getLengthOfPages > 1"
         md="12"
       >
         <v-pagination
           v-model="currentPage"
-          :length="getLenghtOfPages"
+          :length="getLengthOfPages"
           rounded="circle"
           @update:model-value="getProjectsByPage"
         />
@@ -214,7 +214,7 @@ export default defineComponent({
       'getProjects',
       'getFetchProjectsList',
       'getCurrentPage',
-      'getLenghtOfPages',
+      'getLengthOfPages',
       'getCategoryFilter',
       'getTeachingLevelFilter',
       'getKnowledgeAreaFilter',
@@ -255,7 +255,7 @@ export default defineComponent({
     ...mapMutations('projects', [
       'setProjects',
       'setCurrentPage',
-      'setLenghtOfPages',
+      'setLengthOfPages',
       'setCurrentProject',
       'setFetchProject',
       'setFetchProjectsList',
@@ -280,7 +280,7 @@ export default defineComponent({
         .then((response) => {
           this.setProjects(response.data);
           this.loading = false;
-          this.setLenghtOfPages(response?.meta?.pages || 1);
+          this.setLengthOfPages(response?.meta?.pages || 1);
           this.setFetchProjectsList(false);
         })
         .catch(() => {
