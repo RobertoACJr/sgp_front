@@ -65,17 +65,13 @@ export default defineComponent({
         .then(({ data }) => {
           this.events = data;
         })
-        .catch(() => {
-          // TODO
-          // algum tratamento
-        })
         .finally(() => {
           this.loading = false;
         })
     },
     goToEvent (event) {
       this.setCurrentEvent(event);
-      this.$router.push({ name: 'listProjects' });
+      this.$router.push({ name: 'showEvent' });
     },
   },
 });
