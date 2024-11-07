@@ -11,12 +11,16 @@ export const list = async params => {
   }
 }
 
-export const getEventPermissions = async params => {
+export const saveEventPermission = async params => {
   try {
-    const { data } = await eventsApi.getEventPermissions(params);
+    const { data } = await eventsApi.saveEventPermission(params);
     return data;
   } catch (error) {
     console.error(error);
+    errorToast({
+      title: "Falha ao requisitar dados do Evento 😿",
+      text: error.response.data.message || "",
+    })
     throw error;
   }
 }
