@@ -6,9 +6,29 @@ const defaultState = () => ({
   fetchEvaluator: true,
   fetchEvaluatorsList: true,
   currentEvaluatorEvaluationIndex: null,
-  categoryFilter: null,
-  teachingLevelFilter: null,
-  knowledgeAreaFilter: null,
+  filter: {
+    isApproved: {
+      value: null,
+      name: 'Usuários: ',
+      displayValue: null,
+      kind: 'string',
+      searchable: 'is_approved',
+    },
+    email: {
+      value: null,
+      name: 'E-mail: ',
+      displayValue: null,
+      kind: 'string',
+      searchable: 'email'
+    },
+    knowledgeAreas: {
+      value: null,
+      name: 'Área do Conhecimento: ',
+      displayValue: null, 
+      kind: 'array',
+      searchable: 'knowledge_areas'
+    },
+  }
 })
 
 export default {
@@ -25,9 +45,45 @@ export default {
     getCurrentEvaluation: state => state.currentEvaluator?.evaluations
       ? state.currentEvaluator?.evaluations[state.currentEvaluatorEvaluationIndex]
       : {},
-    getCategoryFilter: state => state.categoryFilter,
-    getTeachingLevelFilter: state => state.teachingLevelFilter,
-    getKnowledgeAreaFilter: state => state.knowledgeAreaFilter,
+    getFilters: state => state.filter,
+    getDisplayFilterFormatted: state => (key, value) => {
+      const { name, displayValue, kind, searchable } = state.filter[key];
+      return {
+        title: `${name}${displayValue || value?.title || value}`,
+        value,
+        key,
+        kind,
+        searchable
+      } 
+    },
+    getFiltersToDisplayByFilterKey: (state, getters) => (key) => {
+      const { kind, value } = state.filter[key]
+      if (kind == 'array') {
+        return value?.length
+          ? value.map(v => getters.getDisplayFilterFormatted(key, v))
+          : []
+      }
+      return value ? [getters.getDisplayFilterFormatted(key, value)] : []
+    },
+    getDisplayFilters: (state, getters) => {
+      const FILTERS_KEYS = Object.keys(state.filter)
+      const FILTERS = []
+      FILTERS_KEYS.forEach(key => FILTERS.push(...getters.getFiltersToDisplayByFilterKey(key)))
+      return FILTERS
+    },
+    getFiltersToFetch: state => {
+      const PARAMS = []
+      if (state.filter.isApproved.value != null) PARAMS.is_approved = !state.filter.isApproved.value
+      if (state.filter.email.value) PARAMS.email = state.filter.email.value
+      if (state.filter.knowledgeAreas.value?.length) {
+        PARAMS.knowledgeAreas = state.filter.knowledgeAreas.value.map(value => value.value || value)
+      }
+
+      return PARAMS
+    },
+    getFilterIsApproved: state => state.filter?.isApproved.value,
+    getFilterEmail: state => state.filter?.email.value,
+    getFilterKnowledgeAreas: state => state.filter?.knowledgeAreas.value,
   },
   mutations: {
     reset(state) {
@@ -54,26 +110,35 @@ export default {
     setCurrentEvaluatorEvaluationIndex(state, index) {
       state.currentEvaluatorEvaluationIndex = index;
     },
-    setCategoryFilter(state, category) {
-      state.categoryFilter = category;
+    setFilterIsApproved(state, isApproved) {
+      state.filter.isApproved.value = isApproved;
+      state.filter.isApproved.displayValue = isApproved ? 'Aprovados' : 'Restringidos'
     },
-    setTeachingLevelFilter(state, teachingLevel) {
-      state.teachingLevelFilter = teachingLevel;
+    setFilterEmail(state, email) {
+      state.filter.email.value = email;
     },
-    setKnowledgeAreaFilter(state, knowledgeArea) {
-      state.knowledgeAreaFilter = knowledgeArea;
-    },
-    setFilters(state, { category, teachingLevel, knowledgeArea }) {
-      state.categoryFilter = category;
-      state.teachingLevelFilter = teachingLevel;
-      state.knowledgeAreaFilter = knowledgeArea;
+    setFilterKnowledgeAreas(state, knowledgeAreas) {
+      state.filter.knowledgeAreas.value = knowledgeAreas;
     },
     resetFilters(state) {
-      state.categoryFilter = null;
-      state.teachingLevelFilter = null;
-      state.knowledgeAreaFilter = null;
+      state.isApproved = null;
+      state.email = null;
+      state.knowledgeAreas = null;
     },
+    removeFilter(state, { key, value, kind }) {
+      if (kind == 'string') {
+        state.filter[key].value = null
+      }
+      if (kind == 'array') {
+        state.filter[key].value = state.filter[key].value.filter(v => v != value)
+      }
+    }
   },
   actions: {
+    setFilters({ commit }, { isApproved, email, knowledgeAreas }) {
+      commit("setFilterIsApproved", isApproved)
+      commit("setFilterEmail", email)
+      commit("setFilterKnowledgeAreas", knowledgeAreas)
+    },
   },
 }

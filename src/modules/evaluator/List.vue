@@ -61,18 +61,18 @@
         md="12"
         sm="12"
       >
-        <p>Avaliadores encontrados: {{ getFilteredEvaluators.length }}</p>
+        <p>Avaliadores encontrados: {{ getEvaluators.length }}</p>
         <div class="d-flex flex-wrap mt-5">
           Filtros:
           <div
-            v-for="(filter, index) in filters"
+            v-for="(filter, index) in getDisplayFilters"
             :key="index"
             class="mr-2 mb-2 filter-pill"
           >
             {{ filter.title }}
             <v-icon
               color="tertiary"
-              @click="removeFilter(filter)"
+              @click="removerFilter(filter)"
             >
               mdi-alpha-x-circle-outline
             </v-icon>
@@ -80,7 +80,7 @@
         </div>
       </v-col>
       <v-col
-        v-if="!getFilteredEvaluators.length"
+        v-if="!getEvaluators.length"
         md="12"
         sm="12"
         class="mt-5"
@@ -118,7 +118,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="(evaluator, index) in getFilteredEvaluators"
+              v-for="(evaluator, index) in getEvaluators"
               :key="index"
               @click="goToEvaluator(evaluator)"
             >
@@ -136,9 +136,9 @@
               </td>
               <td class="text-body-2 text-center">
                 <v-icon
-                  :color="evaluator.is_approved ? 'primary' : 'tertiary'"
+                  :color="evaluator?.is_approved ? 'primary' : 'tertiary'"
                 >
-                  {{ evaluator.is_approved ? 'mdi-checkbox-marked-circle-outline' : 'mdi-close-circle-outline' }}
+                  {{ evaluator?.is_approved ? 'mdi-checkbox-marked-circle-outline' : 'mdi-close-circle-outline' }}
                 </v-icon>
               </td>
             </tr>
@@ -158,29 +158,28 @@
       </v-col>
     </v-row>
   </v-container>
-  <!-- <ModalFilters
+  <ModalFilters
     :is-open="isFiltersModalOpen"
-    @set-filters="(newFilters) => filters = newFilters"
+    @apply-filters="getEvaluatorsByPage"
     @close="() => isFiltersModalOpen = false"
-  /> -->
+  />
 </template>
 
 <script>
 import { defineComponent } from 'vue';
 import { mapGetters, mapMutations } from 'vuex';
 
-// import ModalFilters from '@/modules/evaluators/components/ModalFilters.vue';
+import ModalFilters from '@/modules/evaluator/components/ModalFilters.vue';
 
 import * as evaluatorService from '@/modules/evaluator/services/evaluator.service';
 
 export default defineComponent({
   name: 'ListEvaluators',
   components: {
-    // ModalFilters,
+    ModalFilters,
   },
   data: () => ({
     loading: false,
-    filters: [],
     isFiltersModalOpen: false,
   }),
   computed: {
@@ -193,9 +192,8 @@ export default defineComponent({
       'getFetchEvaluatorsList',
       'getCurrentPage',
       'getLengthOfPages',
-      'getCategoryFilter',
-      'getTeachingLevelFilter',
-      'getKnowledgeAreaFilter',
+      'getDisplayFilters',
+      'getFiltersToFetch',
     ]),
     currentPage: {
       get() {
@@ -206,27 +204,11 @@ export default defineComponent({
       }
     },
     hasFilters() {
-      return Boolean(
-        this.getCategoryFilter?.length ||
-        this.getTeachingLevelFilter?.length ||
-        this.getKnowledgeAreaFilter?.length
-      );
-    },
-    getFilteredEvaluators() {
-      return this.getEvaluators.filter(evaluator => {
-        return this.evaluatorHasFilteredCategory(evaluator.category) &&
-          this.evaluatorHasFilteredKnoledgeArea(evaluator.knowledge_area) &&
-          this.evaluatorHasFilteredTeachingLevel(evaluator.teaching_level)
-      })
+      return Boolean(this.getDisplayFilters.length);
     },
   },
   mounted() {
     this.getFetchEvaluatorsList && this.getEvaluatorsByPage();
-    this.filters = [
-      ...this.getCategoryFilter ? this.getCategoryFilter.map(f => ({ title: f, type: 'category' })) : [],
-      ...this.getTeachingLevelFilter ? this.getTeachingLevelFilter.map(f => ({ title: f, type: 'teaching_level' })) : [],
-      ...this.getKnowledgeAreaFilter ? this.getKnowledgeAreaFilter.map(f => ({ title: f, type: 'knowledge_area' })) : [],
-    ]
     this.setFetchEvaluator(true);
   },
   methods: {
@@ -237,24 +219,25 @@ export default defineComponent({
       'setCurrentEvaluator',
       'setFetchEvaluator',
       'setFetchEvaluatorsList',
-      'setCategoryFilter',
-      'setTeachingLevelFilter',
-      'setKnowledgeAreaFilter',
+      'removeFilter'
     ]),
-    goToEvaluator (evaluator) {
+    goToEvaluator(evaluator) {
       this.setCurrentEvaluator(evaluator);
       this.goTo('showEvaluator')
     },
     goTo(name) {
       this.$router.push({ name });
     },
-    getEvaluatorsByPage () {
-      this.loading = true;
-      let params = {
+    getParams() {
+      return {
         page: this.getCurrentPage,
         per_page: 100,
-        // is_approved: true,
-      };
+        ...this.getFiltersToFetch
+      }
+    },
+    getEvaluatorsByPage() {
+      this.loading = true
+      let params = this.getParams()
       evaluatorService.list(params)
         .then((response) => {
           this.setEvaluators(response.data);
@@ -266,26 +249,9 @@ export default defineComponent({
           this.loading = false;
         })
     },
-    evaluatorHasFilteredCategory (category) {
-      return !this.getCategoryFilter || !this.getCategoryFilter.length || this.getCategoryFilter.includes(category);
-    },
-    evaluatorHasFilteredTeachingLevel (teachingLevel) {
-      return !this.getTeachingLevelFilter || !this.getTeachingLevelFilter.length || this.getTeachingLevelFilter.includes(teachingLevel);
-    },
-    evaluatorHasFilteredKnoledgeArea (knowledgeArea) {
-      return !this.getKnowledgeAreaFilter || !this.getKnowledgeAreaFilter.length || this.getKnowledgeAreaFilter.includes(knowledgeArea);
-    },
-    removeFilter(filter) {
-      if (filter.type == 'category') {
-        this.setCategoryFilter(this.getCategoryFilter.filter(f => f != filter.title));
-      }
-      if (filter.type == 'teaching_level') {
-        this.setTeachingLevelFilter(this.getTeachingLevelFilter.filter(f => f != filter.title));
-      }
-      if (filter.type == 'knowledge_area') {
-        this.setKnowledgeAreaFilter(this.getKnowledgeAreaFilter.filter(f => f != filter.title));
-      }
-      this.filters = this.filters.filter(f => f != filter);
+    removerFilter(filter) {
+      this.removeFilter(filter)
+      this.getEvaluatorsByPage()
     },
     getKnowledgeAreasText(knowledgeAreas) {
       return knowledgeAreas

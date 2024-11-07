@@ -15,21 +15,19 @@
             title="Selecione os filtros desejados"
           />
           <v-card-text>
-            <v-select
-              v-model="teachingLevel"
-              clearable
-              chips
-              label="Nível de Ensino"
-              :items="['Ensino Fundamental', 'Ensino Médio']"
-              multiple
+            <v-checkbox
+              v-model="isApproved"
+              label="Avaliadores Verificados"
+              value="1"
             />
-            <v-select
-              v-model="category"
-              clearable
-              chips
-              label="Categoria do Projeto"
-              :items="['Pesquisa Científica', 'Pesquisa Tecnológica']"
-              multiple
+            <v-checkbox
+              v-model="isApproved"
+              label="Avaliadores Restringidos"
+              value="0"
+            />
+            <v-text-field
+              v-model="email"
+              label="E-mail"
             />
             <v-select
               v-model="knowledgeArea"
@@ -78,8 +76,9 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations } from 'vuex';
+
 export default {
-  name: "ModalValidateProjectCode",
+  name: "ModalFilters",
   props: {
     isOpen: {
       type: Boolean,
@@ -88,19 +87,19 @@ export default {
   },
   emits: [
     "close",
-    "set-filters",
+    "apply-filters",
   ],
   data: () => ({
     isFormValid: false,
-    category: [],
+    email: "",
+    isApproved: null,
     knowledgeArea: [],
-    teachingLevel: [],
   }),
   computed: {
-    ...mapGetters('projects', [
-      'getCategoryFilter',
-      'getTeachingLevelFilter',
-      'getKnowledgeAreaFilter',
+    ...mapGetters('evaluator', [
+      'getFilterIsApproved',
+      'getFilterEmail',
+      'getFilterKnowledgeAreas',
     ]),
     ...mapGetters('knowledgeArea', [
       'getKnowledgeAreas',
@@ -116,17 +115,21 @@ export default {
   },
   mounted() {
     this.fetchKnowledgeAreaOptionsIfNecessary()
-    this.category = this.getCategoryFilter;
-    this.teachingLevel = this.getTeachingLevelFilter;
-    this.knowledgeArea = this.getKnowledgeAreaFilter;
+    this.isApproved = this.getFilterIsApproved != null
+      ? this.getFilterIsApproved ? 1 : 0
+      : null;
+    this.email = this.getFilterEmail;
+    this.knowledgeArea = this.getFilterKnowledgeAreas;
   },
   methods: {
-    ...mapMutations('projects', [
-      'setFilters',
+    ...mapMutations('evaluator', [
       'resetFilters',
     ]),
     ...mapActions('knowledgeArea', [
       'fetchKnowledgeAreaOptionsIfNecessary',
+    ]),
+    ...mapActions('evaluator', [
+      'setFilters',
     ]),
     closeModal() {
       this.showInvalidCodeWarning = false;
@@ -134,24 +137,20 @@ export default {
     },
     applyFilters() {
       const filters = {
-        category: this.category?.length ? this.category : null,
-        teachingLevel: this.teachingLevel?.length ? this.teachingLevel : null,
-        knowledgeArea: this.knowledgeArea?.length ? this.knowledgeArea : null,
+        isApproved: this.isApproved != null ? !!this.isApproved : null,
+        email: this.email,
+        knowledgeAreas: this.knowledgeArea?.length
+          ? this.knowledgeArea.map(kArea => this.getKnowledgeAreas
+            .find(({ value }) => value == kArea))
+          : null,
       };
       this.setFilters(filters);
-      this.$emit(
-        'set-filters',
-        [
-          ...filters.category ? filters.category.map(f => ({ title: f, type: 'category' })) : [],
-          ...filters.knowledgeArea ? filters.knowledgeArea.map(f => ({ title: f, type: 'knowledge_area' })) : [],
-          ...filters.teachingLevel ? filters.teachingLevel.map(f => ({ title: f, type: 'teaching_level' })) : [],
-        ]
-      );
       this.closeModal();
+      this.$emit("apply-filters");
     },
     limparFiltros() {
-      this.category = [];
-      this.teachingLevel = [];
+      this.email = [];
+      this.isApproved = [];
       this.knowledgeArea = [];
       this.resetFilters();
       this.$emit('set-filters', []);

@@ -74,6 +74,7 @@
         >
           <v-select
             v-model="knowledgeArea"
+            :menu-props="{ width: '250' }"
             :items="getKnowledgeAreas"
             label="Áreas do Conhecimento"
             placeholder="Escolha ao menos uma área"
