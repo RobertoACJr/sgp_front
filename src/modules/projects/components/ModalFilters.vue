@@ -32,6 +32,7 @@
               multiple
             />
             <v-select
+              v-if="!loadingKnowledgeArea"
               v-model="knowledgeArea"
               clearable
               chips
