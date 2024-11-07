@@ -58,11 +58,15 @@ export default defineComponent({
     ]),
 
     getEventPermissions() {
+      this.loading = true
       eventsService.saveEventPermission({
         event_uuid: this.getCurrentEvent.value,
       })
         .then(() => {
           this.$router.push({ name: "listProjects" });
+        })
+        .finally(() => {          
+          this.loading = false
         })
     },
   },
