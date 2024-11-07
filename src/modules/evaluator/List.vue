@@ -160,7 +160,7 @@
   </v-container>
   <ModalFilters
     :is-open="isFiltersModalOpen"
-    @apply-filters="getEvaluatorsByPage"
+    @apply-filters="filter"
     @close="() => isFiltersModalOpen = false"
   />
 </template>
@@ -257,7 +257,11 @@ export default defineComponent({
       return knowledgeAreas
         ? knowledgeAreas.map(({ prefix }) => prefix).join(", ")
         : "---"
-    }
+    },
+    filter() {
+      this.currentPage = 1;
+      this.getEvaluatorsByPage()
+    },
   },
 });
 </script>
