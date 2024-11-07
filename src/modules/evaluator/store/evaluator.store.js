@@ -73,10 +73,14 @@ export default {
     },
     getFiltersToFetch: state => {
       const PARAMS = []
-      if (state.filter.isApproved.value != null) PARAMS.is_approved = !state.filter.isApproved.value
-      if (state.filter.email.value) PARAMS.email = state.filter.email.value
+      if (state.filter.isApproved.value != null) {
+        PARAMS[state.filter.isApproved.searchable] = !state.filter.isApproved.value
+      }
+      if (state.filter.email.value) {
+        PARAMS[state.filter.email.searchable] = state.filter.email.value
+      }
       if (state.filter.knowledgeAreas.value?.length) {
-        PARAMS.knowledgeAreas = state.filter.knowledgeAreas.value.map(value => value.value || value)
+        PARAMS[state.filter.knowledgeAreas.searchable] = state.filter.knowledgeAreas.value.map(value => value.value || value)
       }
 
       return PARAMS

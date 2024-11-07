@@ -118,7 +118,9 @@ export default {
     this.fetchKnowledgeAreaOptionsIfNecessary()
     this.category = this.getCategoryFilter;
     this.teachingLevel = this.getTeachingLevelFilter;
-    this.knowledgeArea = this.getKnowledgeAreaFilter;
+    this.knowledgeArea = this.getKnowledgeAreaFilter &&
+      this.getKnowledgeAreaFilter.map(f =>
+        this.getKnowledgeAreas.find(({ title }) => title == f).value);
   },
   methods: {
     ...mapMutations('projects', [
@@ -136,7 +138,10 @@ export default {
       const filters = {
         category: this.category?.length ? this.category : null,
         teachingLevel: this.teachingLevel?.length ? this.teachingLevel : null,
-        knowledgeArea: this.knowledgeArea?.length ? this.knowledgeArea : null,
+        knowledgeArea: this.knowledgeArea?.length
+          ? this.knowledgeArea.map(f =>
+            this.getKnowledgeAreas.find(({ value }) => value == f).title)
+          : null,
       };
       this.setFilters(filters);
       this.$emit(

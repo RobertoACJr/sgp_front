@@ -9,10 +9,10 @@
       v-if="loading"
     />
     <v-row
-      v-else-if="events.length"
+      v-else-if="getListEvents.length"
     >
       <v-col
-        v-for="(event, key) in events"
+        v-for="(event, key) in getListEvents"
         :key="key"
         cols="12"
         md="4"
@@ -46,24 +46,39 @@ export default defineComponent({
   },
   data: () => ({
     loading: true,
-    events: [],
   }),
   computed: {
     ...mapGetters("auth", [
       "getUserUuid",
+      "getToken"
+    ]),
+    ...mapGetters("events", [
+      "getListEvents"
     ])
   },
   mounted() {
-    this.getEvents();
-    this.reset();
+    if (this.getToken) {
+      this.getEvents();
+      this.reset();
+    } else {
+      this.$router.push({ name: "login" })
+    }
   },
   methods: {
-    ...mapMutations("events", ["setCurrentEvent"]),
+    ...mapMutations("events", [
+      "setListEvents",
+      "setCurrentEvent"
+    ]),
     ...mapMutations('projects', ['reset']),
     getEvents() {
+      if (this.getListEvents?.length) {
+        this.loading = false;
+        return
+      }
+
       eventsService.list({ userUuid: this.getUserUuid })
         .then(({ data }) => {
-          this.events = data;
+          this.setListEvents(data);
         })
         .finally(() => {
           this.loading = false;

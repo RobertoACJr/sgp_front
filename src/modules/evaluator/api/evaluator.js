@@ -13,5 +13,5 @@ export const create = async (payload) => {
 }
 
 export const update = async ({ payload, uuid }) => {
-  return axios.post(`user/${uuid}`, payload);
+  return axios.put(`user/${uuid}`, payload);
 }

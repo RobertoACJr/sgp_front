@@ -321,7 +321,7 @@ export default {
         document: this.document,
         password: this.password,
         confirm_password: this.verifyPassword,
-        knowledge_areas: this.knowledgeArea.map(({ value }) => { return value }),
+        knowledge_areas: this.knowledgeArea,
       }
     },
   },

@@ -28,6 +28,7 @@ export default {
 
   mounted() {
     this.initializeStore();
+    this.$router.push({ name: "listEvents" })
   },
 
   methods: {
