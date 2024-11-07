@@ -88,6 +88,7 @@ export default {
   emits: [
     "close",
     "apply-filters",
+    "set-filters",
   ],
   data: () => ({
     isFormValid: false,

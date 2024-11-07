@@ -316,7 +316,9 @@ export default defineComponent({
       return !this.getTeachingLevelFilter || !this.getTeachingLevelFilter.length || this.getTeachingLevelFilter.includes(teachingLevel);
     },
     projectHasFilteredKnoledgeArea (knowledgeArea) {
-      return !this.getKnowledgeAreaFilter || !this.getKnowledgeAreaFilter.length || this.getKnowledgeAreaFilter.includes(knowledgeArea);
+      return !this.getKnowledgeAreaFilter ||
+        !this.getKnowledgeAreaFilter.length ||
+        this.getKnowledgeAreaFilter.find(f => f.includes(knowledgeArea));
     },
     removeFilter(filter) {
       if (filter.type == 'category') {
