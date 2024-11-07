@@ -73,6 +73,7 @@
           lg="6"
         >
           <v-select
+            v-if="!loadingKnowledgeArea"
             v-model="knowledgeArea"
             :items="knowledgeAreaOptions"
             :disabled="loadingKnowledgeArea"

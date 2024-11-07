@@ -73,9 +73,9 @@
           lg="6"
         >
           <v-select
+            v-if="!loadingKnowledgeArea"
             v-model="knowledgeArea"
             :items="knowledgeAreaOptions"
-            :disabled="loadingKnowledgeArea"
             label="Áreas do Conhecimento"
             placeholder="Escolha ao menos uma área"
             chips
