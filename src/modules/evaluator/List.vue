@@ -9,19 +9,6 @@
         Lista de Avaliadores
       </div>
       <div>
-        <!-- <v-btn
-          icon
-          class="mr-3"
-          :disabled="loading"
-          title="Exportar Informações dos Avaliadores"
-          @click="exportEvaluators"
-        >
-          <v-icon
-            color="primary"
-          >
-            mdi-account-circle-outline
-          </v-icon>
-        </v-btn> -->
         <v-btn
           icon
           title="Recarregar Listagem"
@@ -115,7 +102,7 @@
               <th class="text-left">
                 Nome
               </th>
-              <th class="text-center">
+              <th class="text-left">
                 E-mail
               </th>
               <th class="text-center">
@@ -123,6 +110,9 @@
               </th>
               <th class="text-center">
                 Tipo
+              </th>
+              <th class="text-center">
+                Cadastro reconhecido
               </th>
             </tr>
           </thead>
@@ -139,10 +129,17 @@
                 {{ evaluator.email }}
               </td>
               <td class="text-body-2 text-center">
-                {{ evaluator.knowledge_areas.join(', ') }}
+                {{ getKnowledgeAreasText(evaluator.knowledge_areas) }}
               </td>
               <td class="text-body-2 text-center">
                 {{ evaluator.role?.name || "--" }}
+              </td>
+              <td class="text-body-2 text-center">
+                <v-icon
+                  :color="evaluator.is_approved ? 'primary' : 'tertiary'"
+                >
+                  {{ evaluator.is_approved ? 'mdi-checkbox-marked-circle-outline' : 'mdi-close-circle-outline' }}
+                </v-icon>
               </td>
             </tr>
           </tbody>
@@ -170,7 +167,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { mapGetters, mapMutations, mapActions } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 
 // import ModalFilters from '@/modules/evaluators/components/ModalFilters.vue';
 
@@ -188,6 +185,7 @@ export default defineComponent({
   }),
   computed: {
     ...mapGetters('permissions', [
+      'verifyPermission',
       'getIsAdmin',
     ]),
     ...mapGetters('evaluator', [
@@ -232,9 +230,6 @@ export default defineComponent({
     this.setFetchEvaluator(true);
   },
   methods: {
-    ...mapActions('permissions', [
-      'verifyPermission'
-    ]),
     ...mapMutations('evaluator', [
       'setEvaluators',
       'setCurrentPage',
@@ -257,7 +252,8 @@ export default defineComponent({
       this.loading = true;
       let params = {
         page: this.getCurrentPage,
-        perPage: 100,
+        per_page: 100,
+        // is_approved: true,
       };
       evaluatorService.list(params)
         .then((response) => {
@@ -290,6 +286,11 @@ export default defineComponent({
         this.setKnowledgeAreaFilter(this.getKnowledgeAreaFilter.filter(f => f != filter.title));
       }
       this.filters = this.filters.filter(f => f != filter);
+    },
+    getKnowledgeAreasText(knowledgeAreas) {
+      return knowledgeAreas
+        ? knowledgeAreas.map(({ prefix }) => prefix).join(", ")
+        : "---"
     }
   },
 });

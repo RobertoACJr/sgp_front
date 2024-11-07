@@ -4,16 +4,40 @@
       v-if="loading"
     />
     <v-dialog
-      v-model="shouldShowChangePassword"
+      v-model="isModalOpen"
       max-width="400"
-      persistent
     >
       <v-card
         prepend-icon="mdi-account-key"
-        title="Alterar senha"
+        title="Esqueceu a senha?"
       >
         <v-card-text>
           <v-row>
+            <v-col
+              cols="12"
+              lg="6"
+            >
+              <v-text-field
+                v-model="email"
+                label="E-mail"
+                :error-messages="getEmailErrors"
+              />
+            </v-col>
+
+            <v-col
+              cols="12"
+              lg="6"
+            >
+              <v-text-field
+                v-model="token"
+                label="Token"
+                name="token"
+                maxlength="5"
+                minlength="5"
+                :error-messages="getTokenErrors"
+              />
+            </v-col>
+
             <v-col
               cols="12"
               lg="6"
@@ -40,13 +64,21 @@
                 :error-messages="getVerifyPasswordErrors"
                 @click:append-inner="showVerifyPassword = !showVerifyPassword"
               />
+              <button
+                class="text-blue text-decoration-none text-center mt-2"
+                href="#"
+                rel="noopener noreferrer"
+                @click="openForgottenPasswordGetToken"
+              >
+                Não possui token?
+              </button>
             </v-col>
           </v-row>
         </v-card-text>
         <template #actions>
           <v-spacer />
-          <v-btn @click="handleChangePassword">
-            Salvar
+          <v-btn @click="handleForgottenPassword">
+            Enviar
           </v-btn>
         </template>
       </v-card>
@@ -58,14 +90,28 @@
 import useVuelidate from '@vuelidate/core';
 import * as authService from '@/modules/auth/services/auth.service.js';
 
-import { mapMutations, mapGetters } from 'vuex';
 import { reactive, computed } from 'vue';
-import { required, minLength, sameAs } from '@vuelidate/validators';
+import { required, minLength, email, sameAs } from '@vuelidate/validators';
 
 export default {
-  name: "ModalChangePassword",
+  name: "ModalGetTokenForgottenPassword",
+
+  props: {
+    isOpen: {
+      type: Boolean,
+      default: false,
+    }
+  },
+
+  emits: [
+    "user-without-token",
+    "close"
+  ],
+
   setup () {
     const state = reactive({
+      email: '',
+      token: '',
       password: '',
       verifyPassword: '',
     })
@@ -73,6 +119,13 @@ export default {
     const password = computed(() => state.password);
 
     const rules = {
+      email: {
+        required,
+        email
+      },
+      token: {
+        required,
+      },
       password: {
         required,
         min: minLength(6)
@@ -87,6 +140,7 @@ export default {
 
     return { state, v$ }
   },
+
   data: () => ({
     requiredMessage: "O campo é obrigatório 😿",
     loading: false,
@@ -95,9 +149,30 @@ export default {
   }),
 
   computed: {
-    ...mapGetters("auth", [
-      "getUserIsUsingTemporaryPassword"
-    ]),
+    isModalOpen: {
+      get () {
+        return this.isOpen && !this.loading;
+      },
+      set () {
+        this.close()
+      }
+    },
+    email: {
+      get () {
+        return this.state.email;
+      },
+      set (value) {
+        this.state.email = value
+      }
+    },
+    token: {
+      get () {
+        return this.state.token;
+      },
+      set (value) {
+        this.state.token = value
+      }
+    },
     password: {
       get () {
         return this.state.password;
@@ -114,13 +189,18 @@ export default {
         this.state.verifyPassword = value
       }
     },
-    shouldShowChangePassword: {
-      get () {
-        return this.getUserIsUsingTemporaryPassword && !this.loading;
-      },
-      set (value) {
-        this.setUserIsUsingTemporaryPassword(value)
-      }
+    getEmailErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.email.required.$invalid && errors.push(this.requiredMessage);
+      this.v$.email.email.$invalid && errors.push("Email inválido");
+      return errors;
+    },
+    getTokenErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.token.required.$invalid && errors.push(this.requiredMessage);
+      return errors;
     },
     getPasswordErrors () {
       const errors = [];
@@ -138,6 +218,8 @@ export default {
     },
     getParams() {
       return {
+        email: this.email,
+        token: this.token,
         new_password: this.password,
         confirm_new_password: this.verifyPassword
       }
@@ -145,23 +227,26 @@ export default {
   },
 
   methods: {
-    ...mapMutations("auth", [
-      "setUserIsUsingTemporaryPassword"
-    ]),
-    async handleChangePassword () {
+    async handleForgottenPassword () {
       this.v$.$touch()
-      if (this.v$.$invalid) return
-      await this.changePassword()
+      if (this.v$.$invalid) return;
+      await this.sendToken();
     },
-    async changePassword () {
+    async sendToken () {
       try {
-        this.loading = true
-        await authService.changePassword(this.getParams)
-        this.setUserIsUsingTemporaryPassword(false)
+        this.loading = true;
+        await authService.forgottenPasswordSendToken(this.getParams);
+        this.close();
       } finally {
         this.loading = false;
       }
     },
+    openForgottenPasswordGetToken() {
+      this.$emit("user-without-token")
+    },
+    close() {
+      this.$emit("close");
+    }
   },
 }
 </script>

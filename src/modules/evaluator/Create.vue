@@ -47,7 +47,7 @@
           <v-text-field
             v-model="contact"
             label="Telefone para contato"
-            placeholder="XX XXXXX-XXXX"
+            placeholder="(XX) XXXXX-XXXX"
             name="phone"
             maxlength="15"
             :error-messages="getContactErrors"
@@ -131,7 +131,7 @@ export default {
       email: { required, email },
       contact: {
         required,
-        length: (value) => value && value.length == 11
+        length: (value) => value && value.length == 15
       },
       document: {
         required,
@@ -198,21 +198,21 @@ export default {
       const errors = [];
       if (!this.v$.$dirty) return;
       this.v$.name.required.$invalid && errors.push(this.requiredMessage);
-      this.v$.name.fullName.$invalid && errors.push('Algo de errado num ta certo 😿');
+      this.v$.name.fullName.$invalid && errors.push('Preencha com nome e sobrenome');
       return errors;
     },
     getEmailErrors () {
       const errors = [];
       if (!this.v$.$dirty) return;
       this.v$.email.required.$invalid && errors.push(this.requiredMessage);
-      this.v$.email.email.$invalid && errors.push('Algo de errado num ta certo 😿');
+      this.v$.email.email.$invalid && errors.push('E-mail inválido');
       return errors;
     },
     getContactErrors () {
       const errors = [];
       if (!this.v$.$dirty) return;
       this.v$.contact.required.$invalid && errors.push(this.requiredMessage);
-      this.v$.contact.length.$invalid && errors.push('Algo de errado num ta certo 😿');
+      this.v$.contact.length.$invalid && errors.push('Telefone inválido');
       return errors;
     },
     getDocumentErrors () {
@@ -253,7 +253,7 @@ export default {
       try {
         this.loading = true;
         await evaluatorService.create(this.getParams);
-        this.$router.push({ name: "listEvents" }) //TODO mudar para lista de avaliadores
+        this.$router.push({ name: "listEvaluators" })
       } finally {
         this.loading = false;
       }

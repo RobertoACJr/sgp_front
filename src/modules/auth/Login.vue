@@ -45,18 +45,37 @@
       >
         Log In
       </v-btn>
-
-      <v-card-text class="text-center">
-        <button
-          class="text-blue text-decoration-none"
-          href="#"
-          rel="noopener noreferrer"
-          @click="goToSignUp"
-        >
-          Cadastre-se agora <v-icon icon="mdi-chevron-right" />
-        </button>
-      </v-card-text>
+      <button
+        class="text-blue text-decoration-none text-start"
+        href="#"
+        rel="noopener noreferrer"
+        @click="openModalForgottenPasswordGetToken"
+      >
+        esqueceu a senha?
+      </button>
     </v-card>
+    <button
+      v-if="!loading"
+      class="text-blue text-decoration-none text-center mt-2"
+      href="#"
+      rel="noopener noreferrer"
+      @click="goToSignUp"
+    >
+      Cadastre-se agora
+      <v-icon icon="mdi-chevron-right" />
+    </button>
+    <ModalForgottenPasswordGetToken
+      v-if="isModalForgottenPasswordGetTokenOpen"
+      :is-open="isModalForgottenPasswordGetTokenOpen"
+      @user-with-token="openModalForgottenPasswordSendToken"
+      @close="closeModalForgottenPasswordGetToken"
+    />
+    <ModalForgottenPasswordSendToken
+      v-if="isModalForgottenPasswordSendTokenOpen"
+      :is-open="isModalForgottenPasswordSendTokenOpen"
+      @user-without-token="openModalForgottenPasswordGetToken"
+      @close="closeModalForgottenPasswordSendToken"
+    />
   </v-container>
 </template>
 
@@ -67,9 +86,15 @@ import * as authService from '@/modules/auth/services/auth.service.js';
 import { reactive } from 'vue';
 import { required, email, minLength } from '@vuelidate/validators';
 import { mapMutations } from 'vuex';
+import ModalForgottenPasswordGetToken from './ModalForgottenPasswordGetToken.vue';
+import ModalForgottenPasswordSendToken from './ModalForgottenPasswordSendToken.vue';
 
 export default {
   name: 'LoginView',
+  components: {
+    ModalForgottenPasswordGetToken,
+    ModalForgottenPasswordSendToken
+  },
   setup () {
     const state = reactive({
       email: '',
@@ -90,6 +115,8 @@ export default {
     emailMessage: "O E-mail inserido é inválido",
     loading: false,
     showPassword: false,
+    isModalForgottenPasswordGetTokenOpen: false,
+    isModalForgottenPasswordSendTokenOpen: false,
   }),
 
   computed: {
@@ -113,6 +140,10 @@ export default {
     ...mapMutations("auth", [
       "setToken",
     ]),
+    ...mapMutations("permissions", [
+      "setPermissions",
+      "setRole"
+    ]),
     login() {
       this.v$.$touch()
       if (this.v$.$invalid) return;
@@ -124,6 +155,8 @@ export default {
       })
         .then(({ data }) => {
           this.setToken(data?.authorization?.token || '');
+          this.setPermissions(data?.user?.permissions)
+          this.setRole(data?.user?.role)
           this.$router.push({ name: 'listEvents' });
         })
         .catch(() => {
@@ -132,7 +165,24 @@ export default {
     },
     goToSignUp() {
       this.$router.push({ name: 'signUp' })
-    }
+    },
+    goToForgetPassword() {
+      this.$router.push({ name: 'recoverPassword' })
+    },
+    openModalForgottenPasswordSendToken() {
+      this.closeModalForgottenPasswordGetToken()
+      this.isModalForgottenPasswordSendTokenOpen = true
+    },
+    openModalForgottenPasswordGetToken() {
+      this.closeModalForgottenPasswordSendToken()
+      this.isModalForgottenPasswordGetTokenOpen = true
+    },
+    closeModalForgottenPasswordSendToken () {
+      this.isModalForgottenPasswordSendTokenOpen = false
+    },
+    closeModalForgottenPasswordGetToken () {
+      this.isModalForgottenPasswordGetTokenOpen = false
+    },
   },
 }
 </script>
@@ -142,8 +192,8 @@ export default {
   display: flex;
   height: 100%;
   width: 100%;
+  flex-direction: column;
   justify-content: center;
-  align-items: center;
 
   &__card {
     display: flex;
