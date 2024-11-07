@@ -39,6 +39,24 @@
             </div>
             {{ getCurrentEvaluator?.contact || "" }}
           </v-col>
+          <v-col
+            xl="3"
+            md="4"
+            sm="6"
+            cols="12"
+          >
+            <div
+              class="text-body-1 mb-3 font-weight-black"
+            >
+              Avaliações liberadas?
+            </div>
+            {{ getCurrentEvaluator?.is_approved ? "Avaliador Aprovado" : "Avaliador com restrições" }}
+            <v-icon
+              :color="getCurrentEvaluator?.is_approved ? 'primary' : 'tertiary'"
+            >
+              {{ getCurrentEvaluator?.is_approved ? 'mdi-checkbox-marked-circle-outline' : 'mdi-close-circle-outline' }}
+            </v-icon>
+          </v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -96,7 +114,7 @@
     <v-btn
       block
       class="mt-8"
-      color="tertiary"
+      :color="getCurrentEvaluator?.is_approved ? 'tertiary' : 'primary'"
       size="large"
       variant="tonal"
       @click="openModalValidateChangeEvaluatorApprovedStatus"
@@ -135,6 +153,17 @@ export default defineComponent({
       'getCurrentEvaluator',
       'getFetchEvaluator',
     ]),
+    getPayloadEditEvaluator() {
+      return {
+        is_approved: !this.getCurrentEvaluator.is_approved,
+        name: this.getCurrentEvaluator.name,
+        email: this.getCurrentEvaluator.email,
+        contact: this.getCurrentEvaluator.contact,
+        document: this.getCurrentEvaluator.document,
+        knowledge_areas: this.getCurrentEvaluator.knowledge_areas.map(({ id }) => id),
+        change_password: false,
+      }
+    }
   },
   mounted() {
     this.getFetchEvaluator && this.getEvaluatorInformations();
@@ -152,7 +181,7 @@ export default defineComponent({
     changeEvaluatorStatus() {
       this.isModalValidateChangeEvaluatorApprovedStatusOpen = false;
       this.loading = true;
-      const payload = { is_approved: !this.getCurrentEvaluator.is_approved }
+      const payload = this.getPayloadEditEvaluator
       evaluatorService.update({
         payload,
         uuid: this.getCurrentEvaluator.uuid
