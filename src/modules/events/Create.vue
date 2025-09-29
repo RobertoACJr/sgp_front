@@ -16,57 +16,118 @@
       elevation="8"
       rounded="lg"
     >
-      <v-row>
-        <v-col
-          cols="12"
-          lg="6"
-        >
-          <v-text-field
-            v-model="state.description"
-            label="Titulo"
-            :error-messages="getDescriptionErrors"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          lg="6"
-        >
-          <v-date-input
-            v-model="state.startDate"
-            label="Data de ínicio"
-            :min="getStartDateMinDate"
-            :error-messages="getStartDateErrors"
-            prepend-icon=""
-            @update:model-value="() => state.endDate = null"
-          />
-        </v-col>
-        <v-col
-          v-if="state.startDate"
-          cols="12"
-          lg="6"
-        >
-          <v-date-input
-            v-model="state.endDate"
-            label="Data de Encerramento"
-            :min="getEndDateMinDate"
-            :error-messages="getEndDateErrors"
-            prepend-icon=""
-          />
-        </v-col>
-        <v-col
-          cols="6"
-        >
-          <v-btn
-            block
-            color="primary"
-            size="large"
-            variant="tonal"
-            @click="handleSaveEvent"
+      <v-form
+        v-model="v$.$invalid"
+        @submit.prevent="handleSaveEvent"
+      >
+        <v-row>
+          <v-col
+            cols="12"
           >
-            Cadastrar
-          </v-btn>
-        </v-col>
-      </v-row>
+            <v-text-field
+              v-model="state.description"
+              name="title"
+              label="Titulo"
+              :error-messages="getDescriptionErrors"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+          >
+            <v-date-input
+              v-model="state.startDate"
+              label="Data de ínicio"
+              placeholder="DD/MM/AAAA"
+              autocomplete="new-password"
+              name="start_date"
+              :min="getStartDateMinDate"
+              :error-messages="getStartDateErrors"
+              prepend-icon=""
+              @update:model-value="() => state.endDate = null"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+          >
+            <v-text-field
+              :model-value="state.startTime"
+              label="Horário de início"
+              prepend-icon="mdi-clock-time-four-outline"
+              readonly
+            >
+              <v-dialog
+                v-model="showDialogStartTime"
+                activator="parent"
+                width="auto"
+              >
+                <v-time-picker
+                  v-model="state.startTime"
+                  format="24hr"
+                  color="green-darken-2"
+                />
+              </v-dialog>
+            </v-text-field>
+          </v-col>
+          <v-col
+            v-if="state.startDate"
+            cols="12"
+            sm="6"
+          >
+            <v-date-input
+              v-model="state.endDate"
+              label="Data de Encerramento"
+              placeholder="DD/MM/AAAA"
+              autocomplete="new-password"
+              name="end_date"
+              :min="getEndDateMinDate"
+              :error-messages="getEndDateErrors"
+              prepend-icon=""
+            />
+          </v-col>
+          <v-col
+            v-if="state.startDate"
+            cols="12"
+            sm="6"
+          >
+            <v-text-field
+              :model-value="state.endTime"
+              label="Horário de Fim"
+              prepend-icon="mdi-clock-time-four-outline"
+              readonly
+            >
+              <v-dialog
+                v-model="showDialogEndTime"
+                activator="parent"
+                width="auto"
+              >
+                <v-time-picker
+                  v-model="state.endTime"
+                  format="24hr"
+                  color="green-darken-2"
+                />
+              </v-dialog>
+            </v-text-field>
+          </v-col>
+        </v-row>
+        <v-row class="mt-10">
+          <v-col cols="6" />
+          <v-col
+            cols="6"
+          >
+            <v-btn
+              block
+              color="primary"
+              size="large"
+              variant="tonal"
+              type="submit"
+            >
+              Cadastrar
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-form>
     </v-card>
   </v-container>
 </template>
@@ -88,12 +149,17 @@ export default {
     const state = reactive({
       description: '',
       startDate: null,
+      startTime: null,
       endDate: null,
+      endTime: null,
     })
+
     const rules = {
       description: { required },
       startDate: { required },
+      startTime: { required },
       endDate: { required },
+      endTime: { required },
     }
 
     const v$ = useVuelidate(rules, state)
@@ -102,6 +168,8 @@ export default {
   },
   data: () => ({
     requiredMessage: "O campo é obrigatório",
+    showDialogStartTime: false,
+    showDialogEndTime: false,
     loading: false,
   }),
 
@@ -136,22 +204,28 @@ export default {
     getParams () {
       return {
         description: this.state.description,
-        initial_date: this.getFormatedDate(this.state.startDate),
-        final_date: this.getFormatedDate(this.state.endDate)
+        initial_date: this.getFormatedDateTime(this.state.startDate, this.state.startTime),
+        final_date: this.getFormatedDateTime(this.state.endDate, this.state.endTime)
       }
     },
   },
 
   methods: {
     getFormatedDate (date) {
-      const DATE = new Date(date);
-      return DATE.toISOString().split('T')[0];
+      let DATE = new Date(date)
+      return DATE.toISOString().split('T')[0]
     },
+
+    getFormatedDateTime(date, time) {
+      return `${this.getFormatedDate(date)} ${time}:00`
+    },
+
     async handleSaveEvent() {
       this.v$.$touch()
       if (this.v$.$invalid) return;
       await this.saveEvent();
     },
+
     async saveEvent () {
       try {
         this.loading = true;

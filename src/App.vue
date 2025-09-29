@@ -78,7 +78,7 @@ html::-webkit-scrollbar {
   background-color: #f6f6f6;
 }
 
-.v-theme--light {
+.v-table {
   border-radius: 8px !important;
 }
 </style>
