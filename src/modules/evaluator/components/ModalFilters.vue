@@ -35,7 +35,7 @@
               chips
               label="Áreas do conhecimento"
               :menu-props="{ width: '250' }"
-              :items="getKnowledgeAreas"
+              :items="getKnowledgeAreasOptions"
               multiple
             />
           </v-card-text>
@@ -103,7 +103,7 @@ export default {
       'getFilterKnowledgeAreas',
     ]),
     ...mapGetters('knowledgeArea', [
-      'getKnowledgeAreas',
+      'getKnowledgeAreasOptions',
     ]),
     isModalOpen: {
       get() {
@@ -141,7 +141,7 @@ export default {
         isApproved: this.isApproved != null ? !!this.isApproved : null,
         email: this.email,
         knowledgeAreas: this.knowledgeArea?.length
-          ? this.knowledgeArea.map(kArea => this.getKnowledgeAreas
+          ? this.knowledgeArea.map(kArea => this.getKnowledgeAreasOptions
             .find(({ value }) => value == kArea))
           : null,
       };

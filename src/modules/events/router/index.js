@@ -24,7 +24,7 @@ export default [
   },
   {
     path: '/event/create',
-    name: 'createEvents',
+    name: 'createEvent',
     component: CreateEvents,
     meta: {
       needsAuthentication: true,

@@ -1,5 +1,5 @@
 import * as projectApi from '@/modules/projects/api/projects.js';
-import { errorToast } from '@/modules/core/helpers/toastHelper';
+import { errorToast, successToast } from '@/modules/core/helpers/toastHelper';
 
 export const list = async params => {
   try {
@@ -8,7 +8,7 @@ export const list = async params => {
   } catch (error) {
     console.error(error);
     errorToast({
-      title: "Falha ao Listar Projetos",
+      title: "Falha ao listar Projetos",
       text: error.response.data.message || "",
     })
     throw error;
@@ -29,6 +29,36 @@ export const show = async uuid => {
   }
 }
 
+export const create = async params => {
+  try {
+    const { data } = await projectApi.create(params);
+    successToast({ title: "Projeto criado com sucesso! 🥳👍" })
+    return data;
+  } catch (error) {
+    console.error(error);
+    errorToast({
+      title: "Falha ao criar Projeto",
+      text: error.response.data.message || "",
+    })
+    throw error;
+  }
+}
+
+export const update = async config => {
+  try {
+    const { data } = await projectApi.update(config);
+    successToast({ title: "Projeto editado com sucesso! 🥳👍" })
+    return data;
+  } catch (error) {
+    console.error(error);
+    errorToast({
+      title: "Falha ao editar Projeto",
+      text: error.response.data.message || "",
+    })
+    throw error;
+  }
+}
+
 export const rate = async params => {
   try {
     const { data } = await projectApi.rate(params);
@@ -36,7 +66,7 @@ export const rate = async params => {
   } catch (error) {
     console.error(error);
     errorToast({
-      title: "Falha ao Avaliar Projeto",
+      title: "Falha ao avaliar Projeto",
       text: error.response.data.message || "",
     })
     throw error;

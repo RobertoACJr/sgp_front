@@ -1,9 +1,23 @@
 <template>
   <v-container>
     <div
-      class="text-h6 heading-6 mb-5"
+      class="text-h6 heading-6 mb-5 d-flex justify-space-between"
     >
       Lista de Eventos
+      <div
+        v-if="getIsAdmin"
+      >
+        <v-btn
+          icon
+          title="Criar Evento"
+          class="ml-3"
+          @click="() => $router.push({ name: 'createEvent' })"
+        >
+          <v-icon color="primary">
+            mdi-plus
+          </v-icon>
+        </v-btn>
+      </div>
     </div>
     <loading
       v-if="loading"
@@ -48,13 +62,18 @@ export default defineComponent({
     loading: true,
   }),
   computed: {
+    ...mapGetters('permissions', [
+      'getIsAdmin',
+    ]),
     ...mapGetters("auth", [
       "getUserUuid",
       "getToken"
     ]),
     ...mapGetters("events", [
-      "getListEvents"
-    ])
+      "getListEvents",
+      "getCurrentEvent",
+      "getShouldFetchEventPermissions"
+    ]),
   },
   mounted() {
     if (this.getToken) {
@@ -67,7 +86,8 @@ export default defineComponent({
   methods: {
     ...mapMutations("events", [
       "setListEvents",
-      "setCurrentEvent"
+      "setCurrentEvent",
+      "setShouldFetchEventPermissions"
     ]),
     ...mapMutations('projects', ['reset']),
     getEvents() {
@@ -84,8 +104,10 @@ export default defineComponent({
           this.loading = false;
         })
     },
-    goToEvent (event) {
+    goToEvent(event) {
+      const IS_SAME_EVENT = event.value == this.getCurrentEvent.value
       this.setCurrentEvent(event);
+      this.setShouldFetchEventPermissions(!IS_SAME_EVENT || this.getShouldFetchEventPermissions);
       this.$router.push({ name: 'showEvent' });
     },
   },

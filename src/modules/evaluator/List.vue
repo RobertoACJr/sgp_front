@@ -65,14 +65,14 @@
         <div class="d-flex flex-wrap mt-5">
           Filtros:
           <div
-            v-for="(filter, index) in getDisplayFilters"
+            v-for="(dFilter, index) in getDisplayFilters"
             :key="index"
             class="mr-2 mb-2 filter-pill"
           >
-            {{ filter.title }}
+            {{ dFilter.title }}
             <v-icon
               color="tertiary"
-              @click="removerFilter(filter)"
+              @click="removerFilter(dFilter)"
             >
               mdi-alpha-x-circle-outline
             </v-icon>

@@ -41,52 +41,29 @@
     >
       <v-list-item
         prepend-icon="mdi-view-dashboard"
-        title="Lista de Eventos"
+        title="Eventos"
         value="listEvents"
         @click="goTo('listEvents')"
       />
-
+    </v-list>
+    <v-list
+      v-if="getCurrentEventName"
+      class="mt-3"
+      density="compact"
+      nav
+    >
       <v-list-item
-        v-if="verifyPermission({ module: 'events', permission: 'create' })"
-        prepend-icon="mdi-arrange-bring-to-front"
-        title="Cadastrar Evento"
-        value="createEvents"
-        @click="goTo('createEvents')"
+        :title="`Evento: ${getCurrentEventName}`"
+        disabled
       />
-
       <v-list-item
-        v-if="verifyPermission({ module: 'knowledge-areas', permission: 'create' })"
-        prepend-icon="mdi-atom-variant"
-        title="Cadastrar Área do Conhecimento"
-        value="createKnowledgeArea"
-        @click="goTo('createKnowledgeArea')"
+        v-for="({ icon, title, route }, index) in getAllowedMenus"
+        :key="index"
+        :prepend-icon="icon"
+        :title="title"
+        :value="route"
+        @click="goTo(route)"
       />
-
-      <v-list-item
-        v-if="verifyPermission({ module: 'users', permission: 'list' })"
-        prepend-icon="mdi-draw"
-        title="Gestão de Avaliadores"
-        value="listEvaluators"
-        @click="goTo('listEvaluators')"
-      />
-
-      <!-- <v-list-group value="Cadastro">
-        <template
-          #activator="{ props }"
-        >
-          <v-list-item
-            v-bind="props"
-            prepend-icon="mdi-book-open"
-            title="Cadastro"
-          />
-        </template>
-        <v-list-item
-          prepend-icon="mdi-projector-screen-outline"
-          title="Exportação"
-          value="export"
-          @click="goTo('export')"
-        />
-      </v-list-group> -->
     </v-list>
 
     <template #append>
@@ -123,9 +100,15 @@ export default {
       'getUser',
     ]),
     ...mapGetters('permissions', [
-      'verifyPermission',
-      'getIsAdmin',
+      'getAllowedMenus'
     ]),
+    ...mapGetters("events", [
+      "getCurrentEvent"
+    ]),
+
+    getCurrentEventName() {
+      return this.getCurrentEvent?.text
+    }
   },
 
   methods: {

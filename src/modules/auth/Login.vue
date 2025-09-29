@@ -145,6 +145,9 @@ export default {
       "setPermissions",
       "setRole"
     ]),
+    ...mapMutations("events", {
+      resetEvents: "reset"
+    }),
     login() {
       this.v$.$touch()
       if (this.v$.$invalid) return;
@@ -158,6 +161,7 @@ export default {
           this.setToken(data?.authorization?.token || '');
           this.setPermissions(data?.user?.permissions)
           this.setRole(data?.user?.role)
+          this.resetEvents()
           this.$router.push({ name: 'listEvents' });
         })
         .catch(() => {
