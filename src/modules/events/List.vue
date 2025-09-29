@@ -33,7 +33,7 @@
         sm="6"
       >
         <CardEvent
-          :event-title="event.text"
+          :event-title="event.description"
           @click="goToEvent(event)"
         />
       </v-col>
@@ -105,7 +105,7 @@ export default defineComponent({
         })
     },
     goToEvent(event) {
-      const IS_SAME_EVENT = event.value == this.getCurrentEvent.value
+      const IS_SAME_EVENT = event.uuid == this.getCurrentEvent.uuid
       this.setCurrentEvent(event);
       this.setShouldFetchEventPermissions(!IS_SAME_EVENT || this.getShouldFetchEventPermissions);
       this.$router.push({ name: 'showEvent' });
