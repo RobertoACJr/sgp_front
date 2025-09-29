@@ -1,16 +1,29 @@
 <template>
-  <div class="loading-container">
+  <div class="loading-container d-flex flex-column ga-4">
     <v-progress-circular
       :size="50"
       color="primary"
       indeterminate
     />
+    <span
+      v-if="!!text"
+      class="font-weight-bold"
+    >
+      {{ text }}
+    </span>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Loading',
+
+  props: {
+    text: {
+      type: String,
+      default: ""
+    }
+  }
 }
 </script>
 

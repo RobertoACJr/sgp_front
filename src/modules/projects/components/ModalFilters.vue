@@ -37,7 +37,7 @@
               chips
               label="Áreas do conhecimento"
               :menu-props="{ width: '250' }"
-              :items="getKnowledgeAreas"
+              :items="getKnowledgeAreasOptions"
               multiple
             />
           </v-card-text>
@@ -103,7 +103,7 @@ export default {
       'getKnowledgeAreaFilter',
     ]),
     ...mapGetters('knowledgeArea', [
-      'getKnowledgeAreas',
+      'getKnowledgeAreasOptions',
     ]),
     isModalOpen: {
       get() {
@@ -120,7 +120,7 @@ export default {
     this.teachingLevel = this.getTeachingLevelFilter;
     this.knowledgeArea = this.getKnowledgeAreaFilter &&
       this.getKnowledgeAreaFilter.map(f =>
-        this.getKnowledgeAreas.find(({ title }) => title == f).value);
+        this.getKnowledgeAreasOptions.find(({ title }) => title == f).value);
   },
   methods: {
     ...mapMutations('projects', [
@@ -140,7 +140,7 @@ export default {
         teachingLevel: this.teachingLevel?.length ? this.teachingLevel : null,
         knowledgeArea: this.knowledgeArea?.length
           ? this.knowledgeArea.map(f =>
-            this.getKnowledgeAreas.find(({ value }) => value == f).title)
+            this.getKnowledgeAreasOptions.find(({ value }) => value == f).title)
           : null,
       };
       this.setFilters(filters);

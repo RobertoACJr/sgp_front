@@ -75,7 +75,7 @@
           <v-select
             v-model="knowledgeArea"
             :menu-props="{ width: '250' }"
-            :items="getKnowledgeAreas"
+            :items="getKnowledgeAreasOptions"
             label="Áreas do Conhecimento"
             placeholder="Escolha ao menos uma área"
             chips
@@ -151,7 +151,7 @@ export default {
 
   computed: {
     ...mapGetters('knowledgeArea', [
-      'getKnowledgeAreas'
+      'getKnowledgeAreasOptions'
     ]),
     name: {
       get () {

@@ -62,9 +62,22 @@
             mdi-filter-outline
           </v-icon>
         </v-btn>
+        <v-btn
+          icon
+          title="Criar Projeto"
+          class="ml-3"
+          @click="() => $router.push({ name: 'createProject' })"
+        >
+          <v-icon color="primary">
+            mdi-plus
+          </v-icon>
+        </v-btn>
       </div>
     </div>
-    <loading v-if="loading" />
+    <loading
+      v-if="loading"
+      text="Buscando projetos..."
+    />
     <div
       v-else-if="!getProjects.length"
       class="no-content"

@@ -5,7 +5,7 @@
     <div
       class="text-h6 heading-6 mb-5"
     >
-      Cadastro de Projeto
+      {{ isEditing ? `Editando: ${getCurrentProject.name}` : 'Cadastro de Projeto' }}
     </div>
     <loading
       v-if="loading"
@@ -22,9 +22,30 @@
           lg="6"
         >
           <v-text-field
+            v-model="state.title"
+            label="Título do Projeto"
+            :error-messages="getTitleErrorMessage"
+          />
+        </v-col>
+        <v-col
+          cols="12"
+          lg="6"
+        >
+          <v-text-field
             v-model="state.code"
             label="Código do Projeto"
             placeholder="Ex: MDIS-1"
+            :error-messages="getCodeErrorMessage"
+          />
+        </v-col>
+        <v-col
+          cols="12"
+          lg="6"
+        >
+          <v-text-field
+            v-model="state.location"
+            label="Localização do projeto"
+            placeholder="Ex: Biblioteca"
           />
         </v-col>
         <v-col
@@ -35,58 +56,42 @@
             v-model="state.teachingLevel"
             label="Nível de ensino"
             :items="teachingLevelOptions"
-            :error-messages="select.errorMessage.value"
+            :error-messages="getTeachingLevelErrorMessage"
           />
         </v-col>
         <v-col
           cols="12"
           lg="6"
         >
-          <v-row>
-            <v-col
-              cols="12"
-            >
-              Informações do Professor Orientador
-            </v-col>
-            <v-col
-              v-for="(student, index) in state.studentsNames"
-              :key="index"
-              cols="12"
-            >
-              <v-text-field
-                :value="student"
-                v-bind="state.studentsNames[index]"
-                label="Nome do estudante"
-              />
-              <v-btn
-                v-if="index > 0"
-                icon
-                @click="removeStudent(index)"
-              >
-                <v-icon
-                  color="error"
-                >
-                  mdi-delete-outline
-                </v-icon>
-              </v-btn>
-            </v-col>
-            <v-col
-              cols="6"
-              xs="12"
-            >
-              <v-btn
-                v-if="index > 0"
-                @click="removeStudent(index)"
-              >
-                <v-icon
-                  color="error"
-                >
-                  mdi-plus
-                </v-icon>
-                Adicionar
-              </v-btn>
-            </v-col>
-          </v-row>
+          <v-select
+            v-model="state.knowledgeArea"
+            :menu-props="{ width: '250' }"
+            :items="getKnowledgeAreasOptions"
+            label="Áreas do Conhecimento"
+            :error-messages="getKnowledgeAreaErrors"
+          />
+        </v-col>
+        <v-col
+          cols="12"
+          lg="6"
+        >
+          <v-select
+            v-model="state.category"
+            :menu-props="{ width: '250' }"
+            :items="categoryOptions"
+            label="Categoria"
+            :error-messages="getCategoryErrors"
+          />
+        </v-col>
+        <v-col
+          cols="12"
+          lg="6"
+        >
+          <v-text-field
+            v-model="state.institution"
+            label="Instituição"
+            :error-messages="getInstitutionErrors"
+          />
         </v-col>
         <v-col
           cols="12"
@@ -98,8 +103,8 @@
               Informações do Professor Orientador
             </v-col>
             <v-col
-              cols="6"
-              xs="12"
+              sm="6"
+              cols="12"
             >
               <v-text-field
                 v-model="state.advisorProfessor.name"
@@ -108,8 +113,8 @@
               />
             </v-col>
             <v-col
-              cols="6"
-              xs="12"
+              sm="6"
+              cols="12"
             >
               <v-text-field
                 v-model="state.advisorProfessor.email"
@@ -129,8 +134,8 @@
               Informações do Professor Co-orientador (caso haja)
             </v-col>
             <v-col
-              cols="6"
-              xs="12"
+              sm="6"
+              cols="12"
             >
               <v-text-field
                 v-model="state.coAdvisorProfessor.name"
@@ -139,8 +144,8 @@
               />
             </v-col>
             <v-col
-              cols="6"
-              xs="12"
+              sm="6"
+              cols="12"
             >
               <v-text-field
                 v-model="state.coAdvisorProfessor.email"
@@ -154,13 +159,59 @@
           cols="12"
           lg="6"
         >
-          <v-text-field
-            v-model="state.institution"
-            label="Instituição"
-            :error-messages="getInstitutionErrors"
-          />
+          <v-row>
+            <v-col
+              cols="12"
+            >
+              Nomes dos estudantes
+            </v-col>
+            <v-col
+              v-for="(student, index) in state.studentsNames"
+              :key="index"
+              cols="12"
+              class="d-flex g-4"
+            >
+              <v-text-field
+                v-model="state.studentsNames[index]"
+                label="Nome do estudante"
+                :error-messages="getStudentErrorsByIndex(index)"
+              />
+              <v-btn
+                icon
+                title="Remover estudante"
+                :disabled="state.studentsNames.length == 1"
+                @click="removeStudent(index)"
+              >
+                <v-icon
+                  color="error"
+                >
+                  mdi-delete-outline
+                </v-icon>
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+            >
+              <v-btn
+                title="Adicionar estudante"
+                color="success"
+                @click="() => state.studentsNames.push('')"
+              >
+                <v-icon
+                  color="white"
+                >
+                  mdi-plus
+                </v-icon>
+                Adicionar Estudante
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-col>
-
+      </v-row>
+      <v-row class="mt-10">
+        <v-col
+          cols="6"
+        />
         <v-col
           cols="6"
         >
@@ -169,7 +220,7 @@
             color="primary"
             size="large"
             variant="tonal"
-            @click="handleSaveKnowledgeArea"
+            @click="handleSaveProject"
           >
             Cadastrar
           </v-btn>
@@ -181,81 +232,260 @@
 
 <script>
 import useVuelidate from '@vuelidate/core';
-import * as knowledgeAreaService from '@/modules/knowledgeArea/services/knowledgeArea.service.js';
+import * as projectsService from '@/modules/projects/services/projects.service.js';
 
 import { reactive } from 'vue';
 import { required } from '@vuelidate/validators';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'CreateKnowledgeArea',
+
+  props: {
+    isEditing: {
+      type: Boolean,
+      default: false
+    }
+  },
+
   setup () {
     const state = reactive({
-      description: '',
-      startDate: null,
-      endDate: null,
+      title: null,
+      code: null,
+      teachingLevel: null,
+      institution: null,
+      knowledgeArea: null,
+      category: null,
+      location: null,
+      studentsNames: [
+        ""
+      ],
+      advisorProfessor: {
+        name: null,
+        email: null,
+      },
+      coAdvisorProfessor: {
+        name: null,
+        email: null,
+      },
     })
+
     const rules = {
-      prefix: { required },
-      description: { required },
+      title: { required },
+      code: { required },
+      teachingLevel: { required },
+      institution: { required },
+      knowledgeArea: { required },
+      category: { required },
+      studentsNames: {
+        required: (value) => value.every(v => v)
+      },
+      advisorProfessor: {
+        name: { required },
+        email: { required },
+      },
+      coAdvisorProfessor: {
+        name: {
+          required: (name, obj) => obj.email ? required(name) : true
+        },
+        email: {
+          required: (email, obj) => obj.name ? required(email) : true
+        },
+      },
     }
 
     const v$ = useVuelidate(rules, state)
 
     return { state, v$ }
   },
+
   data: () => ({
     requiredMessage: "O campo é obrigatório",
     loading: false,
     teachingLevelOptions: ['1', '2'],
+    categoryOptions: [
+      {
+        title: "Pesquisa Científica",
+        value: 1
+      },
+      {
+        title: "Pesquisa Tecnológica",
+        value: 2
+      }
+    ]
   }),
 
   computed: {
-    prefix: {
-      get () {
-        return this.state.prefix;
-      },
-      set (value) {
-        this.state.prefix = `${value}`.toUpperCase();
-      }
-    },
-    getPrefixErrors () {
+    ...mapGetters('knowledgeArea', [
+      'getKnowledgeAreasOptions'
+    ]),
+    ...mapGetters("events", [
+      "getCurrentEvent"
+    ]),
+    ...mapGetters('projects', [
+      'getCurrentProject',
+    ]),
+
+    getTitleErrorMessage () {
       const errors = [];
       if (!this.v$.$dirty) return;
-      this.v$.prefix.required.$invalid && errors.push(this.requiredMessage);
+      this.v$.title.required.$invalid && errors.push(this.requiredMessage);
       return errors;
     },
-    getDescriptionErrors () {
+
+    getCodeErrorMessage () {
       const errors = [];
       if (!this.v$.$dirty) return;
-      this.v$.description.required.$invalid && errors.push(this.requiredMessage);
+      this.v$.code.required.$invalid && errors.push(this.requiredMessage);
       return errors;
     },
+
+    getTeachingLevelErrorMessage () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.teachingLevel.required.$invalid && errors.push(this.requiredMessage);
+      return errors;
+    },
+
+    getAdvisorProfessorNameErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.advisorProfessor.name.required.$invalid && errors.push(this.requiredMessage);
+      return errors;
+    },
+
+    getAdvisorProfessorEmailErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.advisorProfessor.email.required.$invalid && errors.push(this.requiredMessage);
+      return errors;
+    },
+
+    getCoAdvisorProfessorNameErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.coAdvisorProfessor.name.required.$invalid && errors.push(this.requiredMessage);
+      return errors;
+    },
+
+    getCoAdvisorProfessorEmailErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.coAdvisorProfessor.email.required.$invalid && errors.push(this.requiredMessage);
+      return errors;
+    },
+
+    getInstitutionErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.institution.required.$invalid && errors.push(this.requiredMessage);
+      return errors;
+    },
+
+    getKnowledgeAreaErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.knowledgeArea.required.$invalid && errors.push(this.requiredMessage);
+      return errors;
+    },
+
+    getCategoryErrors () {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.category.required.$invalid && errors.push(this.requiredMessage);
+      return errors;
+    },
+
+    getHasCoAdvisorProfessor() {
+      return !!this.state.coAdvisorProfessor.name && this.state.coAdvisorProfessor.email
+    },
+
     getParams () {
-      return {
-        prefix: this.state.prefix,
-        description: this.state.description,
+      const PARAMS = {
+        title: this.state.title,
+        project_code: this.state.code,
+        project_teaching_level_id: this.state.teachingLevel,
+        institution: this.state.institution,
+        students_name: this.state.studentsNames,
+        advisor_professor: this.state.advisorProfessor,
+        event_uuid: this.getCurrentEvent.value,
+        knowledge_area_id: this.state.knowledgeArea,
+        project_category_id: this.state.category,
+        ...(this.getHasCoAdvisorProfessor ? { co_advisor_professor: this.state.coAdvisorProfessor } : {}),
+        ...(this.state.location ? { location: this.state.location } : {}),
       }
+
+      return PARAMS
     },
   },
 
+  mounted() {
+    if (this.isEditing) {
+      this.handleSetProjectData()
+    }
+  },
+
   methods: {
-    async handleSaveKnowledgeArea() {
+    handleSetProjectData() {
+      this.state.code = this.getCurrentProject?.code || ""
+      this.state.title = this.getCurrentProject?.title || ""
+      // this.state.location = this.getCurrentProject?.location
+      this.state.advisorProfessor.name = this.getCurrentProject?.advisor_professor || ""
+      this.state.coAdvisorProfessor.name = this.getCurrentProject?.co_advisor_professor || ""
+      this.state.institution = this.getCurrentProject?.institution || ""
+      this.state.teachingLevel = this.getCurrentProject?.teaching_level || ""
+      this.state.studentsNames = this.getCurrentProject?.students_name || []
+      this.state.knowledgeArea = this.getCurrentProject?.knowledge_area || ""
+      this.state.category = this.getCurrentProject?.category || ""
+    },
+
+    getStudentErrorsByIndex(index) {
+      const errors = [];
+      if (!this.v$.$dirty) return;
+      this.v$.studentsNames.required.$invalid && !this.state.studentsNames[index] && errors.push(this.requiredMessage);
+      return errors;
+    },
+
+    async handleSaveProject() {
       this.v$.$touch()
       if (this.v$.$invalid) return;
-      await this.saveProject();
+
+      if (this.isEditing) {
+        this.updateProject()
+      } else {
+        this.saveProject()
+      }
     },
+
     async saveProject () {
       try {
         this.loading = true;
-        await knowledgeAreaService.create(this.getParams);
-        this.$router.push({ name: "listEvents" }) //TODO mudar para lista de projetos?
+        await projectsService.create(this.getParams)
+        this.$router.push({ name: "listProjects" })
       } finally {
         this.loading = false;
       }
+    },
+
+    async updateProject () {
+      try {
+        this.loading = true;
+        await projectsService.update(this.getCurrentProject.uuid, this.getParams)
+        this.$router.push({ name: "listProjects" })
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    removeStudent(index) {
+      this.state.studentsNames.splice(index, 1);
     }
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.g-4 {
+  gap: 16px;
+}
 </style>

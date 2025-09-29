@@ -69,14 +69,14 @@
         </v-col>
 
         <v-col
-          v-if="getKnowledgeAreas.length"
+          v-if="getKnowledgeAreasOptions.length"
           cols="12"
           lg="6"
         >
           <v-select
             v-model="knowledgeArea"
             :menu-props="{ width: '250' }"
-            :items="getKnowledgeAreas"
+            :items="getKnowledgeAreasOptions"
             label="Áreas do Conhecimento"
             placeholder="Escolha ao menos uma área"
             multiple
@@ -205,7 +205,7 @@ export default {
 
   computed: {
     ...mapGetters('knowledgeArea', [
-      'getKnowledgeAreas'
+      'getKnowledgeAreasOptions'
     ]),
     name: {
       get () {

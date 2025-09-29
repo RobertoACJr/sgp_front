@@ -24,7 +24,7 @@ export default [
       hasNavBar: true,
       mainModule: "users",
       permission: "list",
-      hasPreviousView: 'listEvents',
+      hasPreviousView: 'showEvent',
     }
   },
   {

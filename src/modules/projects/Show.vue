@@ -2,11 +2,28 @@
   <loading v-if="loading" />
   <v-container v-else>
     <div
-      class="text-h6 heading-6 mb-5"
+      class="text-h6 heading-6 mb-5 d-flex justify-space-between"
     >
-      {{ getCurrentProject.location ? `${getCurrentProject.location} - ` : '' }}
-      {{ getCurrentProject.title }}
-      {{ getIsAdmin ? ` - ${getCurrentProject.code}` : '' }}
+      <span>
+        {{ getCurrentProject.location ? `${getCurrentProject.location} - ` : '' }}
+        {{ getCurrentProject.title }}
+        {{ getIsAdmin ? ` - ${getCurrentProject.code}` : '' }}
+      </span>
+
+      <div
+        v-if="getIsAdmin"
+      >
+        <v-btn
+          icon
+          title="Editar Projeto"
+          class="ml-3"
+          @click="() => $router.push({ name: 'editProject', query: { isEditing: true } })"
+        >
+          <v-icon color="primary">
+            mdi-file-document-edit-outline
+          </v-icon>
+        </v-btn>
+      </div>
     </div>
     <v-row>
       <v-col

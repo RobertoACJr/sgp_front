@@ -39,6 +39,11 @@
             :error-messages="getDescriptionErrors"
           />
         </v-col>
+      </v-row>
+      <v-row class="mt-10">
+        <v-col
+          cols="6"
+        />
         <v-col
           cols="6"
         >

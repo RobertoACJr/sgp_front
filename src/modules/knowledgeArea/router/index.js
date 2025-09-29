@@ -1,4 +1,5 @@
 import CreateKnowledgeArea from '@/modules/knowledgeArea/Create.vue'
+import ListKnowledgeAreas from '@/modules/knowledgeArea/List.vue'
 
 export default [
   {
@@ -10,7 +11,19 @@ export default [
       hasNavBar: true,
       mainModule: "knowledge-areas",
       permission: "create",
-      hasPreviousView: 'listEvents',
+      hasPreviousView: 'showEvent',
+    }
+  },
+  {
+    path: '/knowledge-area/list',
+    name: 'listKnowledgeAreas',
+    component: ListKnowledgeAreas,
+    meta: {
+      needsAuthentication: true,
+      hasNavBar: true,
+      mainModule: "knowledge-areas",
+      permission: "list",
+      hasPreviousView: 'showEvent',
     }
   }
 ]

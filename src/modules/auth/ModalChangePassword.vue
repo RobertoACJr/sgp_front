@@ -1,5 +1,10 @@
 <template>
-  <div class="text-center pa-4">
+  <div
+    :class="[
+      'text-center',
+      shouldShowChangePassword ? 'pa-4' : ''
+    ]"
+  >
     <loading
       v-if="loading"
     />
