@@ -66,7 +66,6 @@
             <tr
               v-for="(knowledgeArea, index) in getKnowledgeAreas"
               :key="index"
-              @click="goToKnowledgeArea(knowledgeArea)"
             >
               <td class="text-body-2">
                 {{ knowledgeArea.prefix }}
@@ -137,15 +136,9 @@ export default defineComponent({
       'setKnowledgeAreas',
       'setCurrentPage',
       'setLengthOfPages',
-      'setCurrentKnowledgeArea',
       'setFetchKnowledgeArea',
       'setFetchKnowledgeAreasList',
     ]),
-
-    goToKnowledgeArea(knowledgeArea) {
-      this.setCurrentKnowledgeArea(knowledgeArea);
-      this.goTo('showKnowledgeArea')
-    },
 
     goTo(name) {
       this.$router.push({ name });
