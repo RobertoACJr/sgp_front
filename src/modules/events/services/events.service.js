@@ -18,7 +18,7 @@ export const saveEventPermission = async params => {
   } catch (error) {
     console.error(error);
     errorToast({
-      title: "Falha ao requisitar dados do Evento 😿",
+      title: "Falha ao requisitar dados do evento 😿",
       text: error.response.data.message || "",
     })
     throw error;
@@ -33,7 +33,22 @@ export const create = async params => {
   } catch (error) {
     console.error(error);
     errorToast({
-      title: "Falha ao Cadastrar Evento 😿",
+      title: "Falha ao cadastrar evento 😿",
+      text: error.response.data.message || "",
+    })
+    throw error;
+  }
+}
+
+export const update = async (uuid, params) => {
+  try {
+    const { data } = await eventsApi.update(uuid, params);
+    successToast({ title: "Evento atualizado 🥳👍" })
+    return data;
+  } catch (error) {
+    console.error(error);
+    errorToast({
+      title: "Falha ao atualizar evento 😿",
       text: error.response.data.message || "",
     })
     throw error;

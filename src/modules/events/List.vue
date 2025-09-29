@@ -4,10 +4,20 @@
       class="text-h6 heading-6 mb-5 d-flex justify-space-between"
     >
       Lista de Eventos
-      <div
-        v-if="getIsAdmin"
-      >
+      <div>
         <v-btn
+          icon
+          title="Recarregar Listagem"
+          @click="() => getEvents(true)"
+        >
+          <v-icon
+            color="secondary"
+          >
+            mdi-sync
+          </v-icon>
+        </v-btn>
+        <v-btn
+          v-if="getIsAdmin"
           icon
           title="Criar Evento"
           class="ml-3"
@@ -90,11 +100,13 @@ export default defineComponent({
       "setShouldFetchEventPermissions"
     ]),
     ...mapMutations('projects', ['reset']),
-    getEvents() {
-      if (this.getListEvents?.length) {
+
+    getEvents(refresh = false) {
+      if (this.getListEvents?.length && !refresh) {
         this.loading = false;
         return
       }
+      this.loading = true;
 
       eventsService.list({ userUuid: this.getUserUuid })
         .then(({ data }) => {
@@ -104,6 +116,7 @@ export default defineComponent({
           this.loading = false;
         })
     },
+
     goToEvent(event) {
       const IS_SAME_EVENT = event.uuid == this.getCurrentEvent.uuid
       this.setCurrentEvent(event);

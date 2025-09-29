@@ -43,10 +43,10 @@
             >
               Orientador
             </div>
-            {{ getCurrentProject?.advisor_professor || "" }}
+            {{ getCurrentProject?.advisor_professor?.name || "" }}
           </v-col>
           <v-col
-            v-if="getCurrentProject?.co_advisor_professor"
+            v-if="getCurrentProject?.co_advisor_professor && getCurrentProject?.co_advisor_professor?.name"
             xl="3"
             md="4"
             sm="6"
@@ -57,7 +57,7 @@
             >
               Co-orientador
             </div>
-            {{ getCurrentProject?.co_advisor_professor || "" }}
+            {{ getCurrentProject?.co_advisor_professor?.name || "" }}
           </v-col>
           <v-col
             xl="3"

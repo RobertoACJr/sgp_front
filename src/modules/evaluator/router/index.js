@@ -1,12 +1,12 @@
-import createEvaluator from '@/modules/evaluator/Create.vue'
-import listEvaluators from '@/modules/evaluator/List.vue'
-import showEvaluator from '@/modules/evaluator/Show.vue'
+import Form from '@/modules/evaluator/Form.vue'
+import List from '@/modules/evaluator/List.vue'
+import Show from '@/modules/evaluator/Show.vue'
 
 export default [
   {
     path: '/evaluator/create',
     name: 'createEvaluator',
-    component: createEvaluator,
+    component: Form,
     meta: {
       needsAuthentication: true,
       hasNavBar: true,
@@ -16,9 +16,24 @@ export default [
     }
   },
   {
+    path: '/evaluator/edit',
+    name: 'editEvaluator',
+    component: Form,
+    props: route => ({
+      isEditing: !!route.query.isEditing
+    }),
+    meta: {
+      needsAuthentication: true,
+      hasNavBar: true,
+      mainModule: "users",
+      permission: "create",
+      hasPreviousView: 'showEvaluator',
+    }
+  },
+  {
     path: '/evaluator/list',
     name: 'listEvaluators',
-    component: listEvaluators,
+    component: List,
     meta: {
       needsAuthentication: true,
       hasNavBar: true,
@@ -30,7 +45,7 @@ export default [
   {
     path: '/evaluator/info',
     name: 'showEvaluator',
-    component: showEvaluator,
+    component: Show,
     meta: {
       needsAuthentication: true,
       hasNavBar: true,

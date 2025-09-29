@@ -9,6 +9,7 @@
     </div>
     <loading
       v-if="loading"
+      :text="loadingText"
     />
     <v-card
       v-else
@@ -25,17 +26,6 @@
             v-model="state.title"
             label="Título do Projeto"
             :error-messages="getTitleErrorMessage"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          lg="6"
-        >
-          <v-text-field
-            v-model="state.code"
-            label="Código do Projeto"
-            placeholder="Ex: MDIS-1"
-            :error-messages="getCodeErrorMessage"
           />
         </v-col>
         <v-col
@@ -157,7 +147,6 @@
         </v-col>
         <v-col
           cols="12"
-          lg="6"
         >
           <v-row>
             <v-col
@@ -236,10 +225,10 @@ import * as projectsService from '@/modules/projects/services/projects.service.j
 
 import { reactive } from 'vue';
 import { required } from '@vuelidate/validators';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 
 export default {
-  name: 'CreateKnowledgeArea',
+  name: 'CreateProject',
 
   props: {
     isEditing: {
@@ -251,7 +240,6 @@ export default {
   setup () {
     const state = reactive({
       title: null,
-      code: null,
       teachingLevel: null,
       institution: null,
       knowledgeArea: null,
@@ -272,7 +260,6 @@ export default {
 
     const rules = {
       title: { required },
-      code: { required },
       teachingLevel: { required },
       institution: { required },
       knowledgeArea: { required },
@@ -286,10 +273,10 @@ export default {
       },
       coAdvisorProfessor: {
         name: {
-          required: (name, obj) => obj.email ? required(name) : true
+          required: (name, obj) => !obj.email || !!name
         },
         email: {
-          required: (email, obj) => obj.name ? required(email) : true
+          required: (email, obj) => !obj.name || !!email
         },
       },
     }
@@ -302,6 +289,7 @@ export default {
   data: () => ({
     requiredMessage: "O campo é obrigatório",
     loading: false,
+    loadingText: "",
     teachingLevelOptions: [
       {
         title: "Ensino Fundamental",
@@ -339,13 +327,6 @@ export default {
       const errors = [];
       if (!this.v$.$dirty) return;
       this.v$.title.required.$invalid && errors.push(this.requiredMessage);
-      return errors;
-    },
-
-    getCodeErrorMessage () {
-      const errors = [];
-      if (!this.v$.$dirty) return;
-      this.v$.code.required.$invalid && errors.push(this.requiredMessage);
       return errors;
     },
 
@@ -412,7 +393,6 @@ export default {
     getParams () {
       const PARAMS = {
         title: this.state.title,
-        project_code: this.state.code,
         project_teaching_level_id: this.state.teachingLevel,
         institution: this.state.institution,
         students_name: this.state.studentsNames,
@@ -435,12 +415,17 @@ export default {
   },
 
   methods: {
+    ...mapMutations('projects', [
+      'setFetchProjectsList',
+    ]),
+
     handleSetProjectData() {
-      this.state.code = this.getCurrentProject?.code || ""
       this.state.title = this.getCurrentProject?.title || ""
-      // this.state.location = this.getCurrentProject?.location
-      this.state.advisorProfessor.name = this.getCurrentProject?.advisor_professor || ""
-      this.state.coAdvisorProfessor.name = this.getCurrentProject?.co_advisor_professor || ""
+      this.state.location = this.getCurrentProject?.location || ""
+      this.state.advisorProfessor.name = this.getCurrentProject?.advisor_professor?.name || ""
+      this.state.advisorProfessor.email = this.getCurrentProject?.advisor_professor?.email || ""
+      this.state.coAdvisorProfessor.name = this.getCurrentProject?.co_advisor_professor?.name || ""
+      this.state.coAdvisorProfessor.email = this.getCurrentProject?.co_advisor_professor?.email || ""
       this.state.institution = this.getCurrentProject?.institution || ""
       this.state.teachingLevel = this.getCurrentProject?.teaching_level || ""
       this.state.studentsNames = this.getCurrentProject?.students_name || []
@@ -469,7 +454,9 @@ export default {
     async saveProject () {
       try {
         this.loading = true;
+        this.loadingText = "Salvando projeto..."
         await projectsService.create(this.getParams)
+        await this.setFetchProjectsList(true)
         this.$router.push({ name: "listProjects" })
       } finally {
         this.loading = false;
@@ -479,7 +466,9 @@ export default {
     async updateProject () {
       try {
         this.loading = true;
+        this.loadingText = "Atualizando projeto..."
         await projectsService.update(this.getCurrentProject.uuid, this.getParams)
+        await this.setFetchProjectsList(true)
         this.$router.push({ name: "listProjects" })
       } finally {
         this.loading = false;

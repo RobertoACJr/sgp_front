@@ -15,6 +15,21 @@
           cover
         >
           {{ getCurrentEvent.description }}
+
+          <div
+            v-if="getIsAdmin"
+          >
+            <v-btn
+              icon
+              title="Editar Evento"
+              class="ml-3"
+              @click="() => $router.push({ name: 'editEvent', query: { isEditing: true } })"
+            >
+              <v-icon color="primary">
+                mdi-file-document-edit-outline
+              </v-icon>
+            </v-btn>
+          </div>
         </v-img>
       </div>
 
@@ -124,6 +139,8 @@ export default defineComponent({
       .v-responsive__content {
         padding: 16px 32px;
         background: linear-gradient(90deg, rgb(var(--v-theme-primary)) 40%, transparent 100%) !important;
+        display: flex;
+        justify-content: space-between;
       }
     }
   }

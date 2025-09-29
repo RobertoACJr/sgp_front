@@ -17,11 +17,13 @@
           <v-card-text>
             <v-checkbox
               v-model="isApproved"
+              color="primary"
               label="Avaliadores Verificados"
               value="1"
             />
             <v-checkbox
               v-model="isApproved"
+              color="primary"
               label="Avaliadores Restringidos"
               value="0"
             />

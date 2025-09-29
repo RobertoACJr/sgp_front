@@ -13,7 +13,7 @@
           icon
           title="Recarregar Listagem"
           :disabled="loading"
-          @click="getEvaluatorsByPage()"
+          @click="getEvaluatorsByPage"
         >
           <v-icon
             color="secondary"
@@ -48,7 +48,10 @@
         </v-btn>
       </div>
     </div>
-    <loading v-if="loading" />
+    <loading
+      v-if="loading"
+      text="Buscando avaliadores..."
+    />
     <div
       v-else-if="!getEvaluators.length"
       class="no-content"
@@ -209,7 +212,6 @@ export default defineComponent({
   },
   mounted() {
     this.getFetchEvaluatorsList && this.getEvaluatorsByPage();
-    this.setFetchEvaluator(true);
   },
   methods: {
     ...mapMutations('evaluator', [
@@ -222,6 +224,7 @@ export default defineComponent({
       'removeFilter'
     ]),
     goToEvaluator(evaluator) {
+      this.setFetchEvaluator(true);
       this.setCurrentEvaluator(evaluator);
       this.goTo('showEvaluator')
     },

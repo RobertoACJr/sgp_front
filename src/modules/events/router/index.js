@@ -1,12 +1,12 @@
-import ShowEvent from '@/modules/events/Show.vue'
-import ListEvents from '@/modules/events/List.vue'
-import CreateEvents from '@/modules/events/Create.vue'
+import Show from '@/modules/events/Show.vue'
+import List from '@/modules/events/List.vue'
+import Form from '@/modules/events/Form.vue'
 
 export default [
   {
     path: '/',
     name: 'listEvents',
-    component: ListEvents,
+    component: List,
     meta: {
       needsAuthentication: true,
       hasNavBar: true,
@@ -15,7 +15,7 @@ export default [
   {
     path: '/event',
     name: 'showEvent',
-    component: ShowEvent,
+    component: Show,
     meta: {
       needsAuthentication: true,
       hasNavBar: true,
@@ -25,7 +25,7 @@ export default [
   {
     path: '/event/create',
     name: 'createEvent',
-    component: CreateEvents,
+    component: Form,
     meta: {
       needsAuthentication: true,
       hasNavBar: true,
@@ -33,5 +33,19 @@ export default [
       mainModule: "events",
       permission: "create",
     }
-  }
+  },
+    {
+      path: "/event/edit",
+      name: "editEvent",
+      component: Form,
+      props: route => ({
+        isEditing: !!route.query.isEditing
+      }),
+      meta: {
+        needsAuthentication: true,
+        mainModule: "event",
+        hasNavBar: true,
+        hasPreviousView: 'listEvents',
+      }
+    }
 ]

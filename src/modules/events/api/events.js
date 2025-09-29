@@ -11,3 +11,7 @@ export const saveEventPermission = async (payload) => {
 export const create = async (payload) => {
   return axios.post('event', payload);
 }
+
+export const update = async (uuid, payload) => {
+  return axios.put(`event/${uuid}`, payload);
+}
