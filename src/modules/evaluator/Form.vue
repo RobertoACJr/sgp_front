@@ -5,10 +5,11 @@
     <div
       class="text-h6 heading-6 mb-5"
     >
-      Cadastro de Avaliador
+      {{ isEditing ? "Editando Avaliador" : "Cadastro de Avaliador" }}
     </div>
     <loading
       v-if="loading"
+      :text="loadingText"
     />
     <v-card
       v-else
@@ -86,6 +87,35 @@
         </v-col>
 
         <v-col
+          v-if="isEditing"
+          cols="6"
+          lg="3"
+        >
+          <v-checkbox
+            v-model="state.resetPassword"
+            color="primary"
+            label="Resetar senha"
+          />
+        </v-col>
+
+        <v-col
+          v-if="isEditing"
+          cols="6"
+          lg="3"
+        >
+          <v-checkbox
+            v-model="state.isApproved"
+            color="primary"
+            label="Usuário aprovado"
+          />
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col
+          cols="6"
+        />
+        <v-col
           cols="6"
         >
           <v-btn
@@ -95,7 +125,7 @@
             variant="tonal"
             @click="handleSaveEvaluator"
           >
-            Cadastrar
+            {{ isEditing ? "Salvar" : "Cadastrar" }}
           </v-btn>
         </v-col>
       </v-row>
@@ -111,16 +141,26 @@ import { reactive } from 'vue';
 import { required, email } from '@vuelidate/validators';
 import { validateCpf, validateFullName } from '@/modules/core/validations';
 import { formatCpf, formatContact } from '@/modules/core/masks';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 
 export default {
   name: 'CreateEvaluator',
+
+  props: {
+    isEditing: {
+      type: Boolean,
+      default: false,
+    }
+  },
+
   setup () {
     const state = reactive({
       name: '',
       email: '',
       contact: '',
       document: '',
+      resetPassword: false,
+      isApproved: false,
       knowledgeArea: []
     })
     const rules = {
@@ -131,7 +171,7 @@ export default {
       email: { required, email },
       contact: {
         required,
-        length: (value) => value && value.length == 15
+        length: (value) => value && value.length >= 14
       },
       document: {
         required,
@@ -144,15 +184,21 @@ export default {
 
     return { state, v$ }
   },
+
   data: () => ({
     requiredMessage: "O campo é obrigatório 😿",
     loading: false,
+    loadingText: "",
   }),
 
   computed: {
     ...mapGetters('knowledgeArea', [
       'getKnowledgeAreasOptions'
     ]),
+    ...mapGetters('evaluator', [
+      'getCurrentEvaluator',
+    ]),
+
     name: {
       get () {
         return this.state.name
@@ -174,7 +220,7 @@ export default {
         return this.state.contact
       },
       set (value) {
-        if (value.length > 15) return
+        if (value.length > 14) return
         this.state.contact = formatContact(value)
       }
     },
@@ -236,28 +282,71 @@ export default {
         contact: this.contact,
         document: this.document,
         knowledge_areas: this.knowledgeArea.map(({ value }) => { return value }),
+        ...(this.isEditing
+          ? {
+            change_password: this.state.resetPassword,
+            is_approved: this.state.isApproved
+          } : {})
       }
     },
   },
 
   mounted() {
-    this.fetchKnowledgeAreaOptionsIfNecessary();
+    this.fetchKnowledgeAreaOptionsIfNecessary()
+
+    this.isEditing && this.setCurrentEvaluatorData()
   },
 
   methods: {
     ...mapActions('knowledgeArea', [
       'fetchKnowledgeAreaOptionsIfNecessary'
     ]),
+    ...mapMutations('evaluator', [
+      'setFetchEvaluator',
+      'setCurrentEvaluator',
+    ]),
+
+    setCurrentEvaluatorData() {
+      this.state.name = this.getCurrentEvaluator.name || ''
+      this.state.email = this.getCurrentEvaluator.email || ''
+      this.contact = this.getCurrentEvaluator.contact || ''
+      this.state.document = this.getCurrentEvaluator.document || ''
+      this.state.knowledgeArea = this.getCurrentEvaluator.knowledge_areas?.map(({ description, id }) => ({ title: description, value: id })) || []
+      this.state.isApproved = this.getCurrentEvaluator?.is_approved || false
+    },
+
     async handleSaveEvaluator() {
       this.v$.$touch()
-      if (this.v$.$invalid) return;
-      await this.saveEvaluator();
+      if (this.v$.$invalid) {
+        return;
+      }
+
+      if (this.isEditing) {
+        return await this.updateEvaluator()
+      }
+
+      await this.saveEvaluator()
     },
-    async saveEvaluator () {
+
+    async saveEvaluator() {
       try {
-        this.loading = true;
-        await evaluatorService.create(this.getParams);
+        this.loading = true
+        this.loadingText = "Salvando avaliador..."
+        await evaluatorService.create(this.getParams)
+        await this.setFetchEvaluator(true)
         this.$router.push({ name: "listEvaluators" })
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateEvaluator() {
+      try {
+        this.loading = true
+        this.loadingText = "Editando avaliador..."
+        const { data } = await evaluatorService.update(this.getCurrentEvaluator.uuid, this.getParams)
+        this.setCurrentEvaluator(data)
+        this.$router.push({ name: "showEvaluator" })
       } finally {
         this.loading = false;
       }

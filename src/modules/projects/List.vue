@@ -76,7 +76,7 @@
     </div>
     <loading
       v-if="loading"
-      text="Buscando projetos..."
+      :text="loadingText"
     />
     <div
       v-else-if="!getProjects.length"
@@ -152,7 +152,7 @@
                 {{ project.code }}
               </td>
               <td class="text-body-2">
-                {{ project.location }} - {{ project.title }}
+                {{ project.location ? `${project.location} -` : "" }}{{ project.title }}
               </td>
               <td class="text-body-2 text-center">
                 {{ project.evaluations_quantity || "não avaliado" }}
@@ -185,7 +185,7 @@
         sm="6"
       >
         <CardProject
-          :project-title="`${project.location} - ${project.title}`"
+          :project-title="`${project.location ? project.location + ' - ' : ''}${project.title}`"
           @click="goToProject(project)"
         />
       </v-col>
@@ -216,6 +216,7 @@ export default defineComponent({
   },
   data: () => ({
     loading: false,
+    loadingText: "",
     filters: [],
     isFiltersModalOpen: false,
   }),
@@ -282,6 +283,7 @@ export default defineComponent({
     },
     getProjectsByPage () {
       this.loading = true;
+      this.loadingText = "Buscando projetos..."
       let params = {};
       if (this.getIsAdmin) {
         params = {
@@ -302,6 +304,7 @@ export default defineComponent({
     },
     exportProjectsRanking () {
       this.loading = true;
+      this.loadingText = "Exportando..."
       exportService.exportProjectsRanking()
         .then((response) => {
           response?.data?.url && window.open(response.data.url, '_blank')
@@ -313,6 +316,7 @@ export default defineComponent({
     },
     exportEvaluators () {
       this.loading = true;
+      this.loadingText = "Exportando"
       exportService.exportEvaluators()
         .then((response) => {
           response?.data?.url && window.open(response.data.url, '_blank')

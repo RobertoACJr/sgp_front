@@ -5,10 +5,11 @@
     <div
       class="text-h6 heading-6 mb-5"
     >
-      Cadastro de Eventos
+      {{ isEditing ? "Editando evento" : "Cadastro de Eventos" }}
     </div>
     <loading
       v-if="loading"
+      :text="loadingText"
     />
     <v-card
       v-else
@@ -123,7 +124,7 @@
               variant="tonal"
               type="submit"
             >
-              Cadastrar
+              {{ isEditing ? "Salvar" : "Cadastrar" }}
             </v-btn>
           </v-col>
         </v-row>
@@ -139,12 +140,22 @@ import * as eventsService from '@/modules/events/services/events.service.js';
 import { reactive } from 'vue';
 import { required } from '@vuelidate/validators';
 import { VDateInput } from 'vuetify/labs/VDateInput'
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'CreateEvents',
+
   components: {
     VDateInput,
   },
+
+  props: {
+    isEditing: {
+      type: Boolean,
+      default: false,
+    }
+  },
+
   setup () {
     const state = reactive({
       description: '',
@@ -166,14 +177,20 @@ export default {
 
     return { state, v$ }
   },
+
   data: () => ({
     requiredMessage: "O campo é obrigatório",
     showDialogStartTime: false,
     showDialogEndTime: false,
     loading: false,
+    loadingText: "",
   }),
 
   computed: {
+    ...mapGetters("events", [
+      "getCurrentEvent"
+    ]),
+
     getDescriptionErrors () {
       const errors = [];
       if (!this.v$.$dirty) return;
@@ -210,6 +227,10 @@ export default {
     },
   },
 
+  mounted() {
+    this.isEditing && this.handleSetEventData()
+  },
+
   methods: {
     getFormatedDate (date) {
       let DATE = new Date(date)
@@ -220,17 +241,63 @@ export default {
       return `${this.getFormatedDate(date)} ${time}:00`
     },
 
+    getDateFromDateTime(dateTime) {
+      const [datePart] = dateTime.split(' ');
+      const [year, month, day] = datePart.split('-');
+
+      const date = new Date(
+        parseInt(year),
+        parseInt(month) - 1,
+        parseInt(day)
+      );
+
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    },
+
+    getTimeFromDateTime(dateTime) {
+      const timePart = dateTime.split(' ')[1];
+      const [hour, minute] = timePart.split(':');
+
+      return `${hour}:${minute}`;
+    },
+
+    handleSetEventData() {
+      this.state.description = this.getCurrentEvent?.description || ""
+      this.state.startDate = this.getDateFromDateTime(this.getCurrentEvent?.initial_datetime)
+      this.state.startTime = this.getTimeFromDateTime(this.getCurrentEvent?.initial_datetime)
+      this.state.endDate = this.getDateFromDateTime(this.getCurrentEvent?.final_datetime)
+      this.state.endTime = this.getTimeFromDateTime(this.getCurrentEvent?.final_datetime)
+    },
+
     async handleSaveEvent() {
       this.v$.$touch()
-      if (this.v$.$invalid) return;
+      if (this.v$.$invalid) {
+        return;
+      }
+
+      if (this.isEditing) {
+        return this.updateEvent();
+      }
       await this.saveEvent();
     },
 
     async saveEvent () {
       try {
         this.loading = true;
+        this.loadingText = "Salvando dados..."
         await eventsService.create(this.getParams);
         this.$router.push({ name: "listEvents" })
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateEvent () {
+      try {
+        this.loading = true;
+        this.loadingText = "Atualizando dados do evento..."
+        await eventsService.update(this.getCurrentEvent.uuid, this.getParams);
+        this.$router.push({ name: "showEvent" })
       } finally {
         this.loading = false;
       }

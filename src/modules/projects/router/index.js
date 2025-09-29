@@ -1,13 +1,13 @@
-import ListProjects from "@/modules/projects/List.vue"
-import ShowProject from "@/modules/projects/Show.vue"
-import RateProject from "@/modules/projects/Rate.vue"
-import CreateProject from "@/modules/projects/Create.vue"
+import List from "@/modules/projects/List.vue"
+import Show from "@/modules/projects/Show.vue"
+import Rate from "@/modules/projects/Rate.vue"
+import Form from "@/modules/projects/Form.vue"
 
 export default [
   {
     path: "/projects",
     name: "listProjects",
-    component: ListProjects,
+    component: List,
     meta: {
       needsAuthentication: true,
       mainModule: "projects",
@@ -18,7 +18,7 @@ export default [
   {
     path: "/projects/info",
     name: "showProject",
-    component: ShowProject,
+    component: Show,
     meta: {
       needsAuthentication: true,
       mainModule: "projects",
@@ -29,7 +29,7 @@ export default [
   {
     path: "/projects/rate",
     name: "rateProject",
-    component: RateProject,
+    component: Rate,
     meta: {
       needsAuthentication: true,
       mainModule: "projects",
@@ -40,7 +40,7 @@ export default [
   {
     path: "/projects/create",
     name: "createProject",
-    component: CreateProject,
+    component: Form,
     meta: {
       needsAuthentication: true,
       mainModule: "projects",
@@ -51,7 +51,7 @@ export default [
   {
     path: "/projects/edit",
     name: "editProject",
-    component: CreateProject,
+    component: Form,
     props: route => ({
       isEditing: !!route.query.isEditing
     }),

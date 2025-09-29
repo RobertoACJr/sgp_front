@@ -12,6 +12,6 @@ export const create = async (payload) => {
   return axios.post('user/createEvaluator', payload);
 }
 
-export const update = async ({ payload, uuid }) => {
-  return axios.put(`user/${uuid}`, payload);
+export const update = async (uuid, params) => {
+  return axios.put(`user/${uuid}`, params);
 }

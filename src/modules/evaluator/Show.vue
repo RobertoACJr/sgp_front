@@ -2,9 +2,35 @@
   <loading v-if="loading" />
   <v-container v-else>
     <div
-      class="text-h6 heading-6 mb-5"
+      class="text-h6 heading-6 mb-5 d-flex justify-space-between"
     >
       {{ getCurrentEvaluator.name }}
+
+      <div
+        v-if="getIsAdmin"
+      >
+        <v-btn
+          icon
+          :title="getCurrentEvaluator?.is_approved ? 'Restringir avaliações' : 'Aprovar Avaliações'"
+          @click="openModalValidateChangeEvaluatorApprovedStatus"
+        >
+          <v-icon
+            :color="getCurrentEvaluator?.is_approved ? 'tertiary' : 'primary'"
+          >
+            {{ getCurrentEvaluator?.is_approved ? 'mdi-account-off' : 'mdi-account-check' }}
+          </v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          title="Editar avaliador"
+          class="ml-3"
+          @click="() => $router.push({ name: 'editEvaluator', query: { isEditing: true } })"
+        >
+          <v-icon color="primary">
+            mdi-file-document-edit-outline
+          </v-icon>
+        </v-btn>
+      </div>
     </div>
     <v-row>
       <v-col
@@ -37,7 +63,7 @@
             >
               Contato
             </div>
-            {{ getCurrentEvaluator?.contact || "" }}
+            {{ getCurrentEvaluator?.contact ? formatContact(getCurrentEvaluator.contact) : "Não cadastrado" }}
           </v-col>
           <v-col
             xl="3"
@@ -111,16 +137,6 @@
         </div>
       </v-col>
     </v-row>
-    <v-btn
-      block
-      class="mt-8"
-      :color="getCurrentEvaluator?.is_approved ? 'tertiary' : 'primary'"
-      size="large"
-      variant="tonal"
-      @click="openModalValidateChangeEvaluatorApprovedStatus"
-    >
-      {{ getCurrentEvaluator?.is_approved ? "Restringir avaliações" : "Aprovar Avaliações" }}
-    </v-btn>
   </v-container>
   <ModalValidateChangeEvaluatorApprovedStatus
     :is-open="isModalValidateChangeEvaluatorApprovedStatusOpen"
@@ -132,19 +148,23 @@
 <script>
 import { defineComponent } from 'vue';
 import { mapGetters, mapMutations } from 'vuex';
+import { formatContact } from '@/modules/core/masks';
 
 import * as evaluatorService from '@/modules/evaluator/services/evaluator.service.js';
 import ModalValidateChangeEvaluatorApprovedStatus from './components/ModalValidateChangeEvaluatorApprovedStatus.vue';
 
 export default defineComponent({
   name: 'ShowEvaluator',
+
   components: {
     ModalValidateChangeEvaluatorApprovedStatus
   },
+
   data: () => ({
     loading: false,
     isModalValidateChangeEvaluatorApprovedStatusOpen: false,
   }),
+
   computed: {
     ...mapGetters('permissions', [
       'getIsAdmin',
@@ -153,6 +173,7 @@ export default defineComponent({
       'getCurrentEvaluator',
       'getFetchEvaluator',
     ]),
+
     getPayloadEditEvaluator() {
       return {
         is_approved: !this.getCurrentEvaluator.is_approved,
@@ -165,16 +186,19 @@ export default defineComponent({
       }
     }
   },
+
   mounted() {
     this.getFetchEvaluator && this.getEvaluatorInformations();
-    this.setFetchEvaluator(true);
   },
+
   methods: {
     ...mapMutations('evaluator', [
       'setCurrentEvaluator',
       'setFetchEvaluator',
       'setFetchEvaluatorsList',
     ]),
+
+    formatContact,
     openModalValidateChangeEvaluatorApprovedStatus() {
       this.isModalValidateChangeEvaluatorApprovedStatusOpen = true;
     },
@@ -199,6 +223,7 @@ export default defineComponent({
       evaluatorService.fetchUser(this.getCurrentEvaluator?.uuid)
         .then(({ data }) => {
           this.setCurrentEvaluator(data)
+          this.setFetchEvaluator(false)
           this.loading = false;
         }).catch(error => {
           console.error(error);

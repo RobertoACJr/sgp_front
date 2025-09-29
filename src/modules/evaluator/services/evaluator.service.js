@@ -8,7 +8,7 @@ export const list = async params => {
   } catch (error) {
     console.error(error);
     errorToast({
-      title: "Falha ao Listar Avaliadores 😿",
+      title: "Falha ao listar avaliadores 😿",
       text: error.response.data.message || "",
     })
     throw error;
@@ -37,22 +37,22 @@ export const create = async params => {
   } catch (error) {
     console.error(error);
     errorToast({
-      title: "Falha ao Cadastrar Avaliador 😿",
+      title: "Falha ao cadastrar avaliador 😿",
       text: error.response.data.message || "",
     })
     throw error;
   }
 }
 
-export const update = async ({ payload, uuid }) => {
+export const update = async (uuid, params) => {
   try {
-    const { data } = await evaluatorApi.update({ payload, uuid });
-    successToast({ title: "Avaliador editado 🥳👍" })
+    const { data } = await evaluatorApi.update(uuid, params);
+    successToast({ title: "Avaliador atualizado 🥳👍" })
     return data;
   } catch (error) {
     console.error(error);
     errorToast({
-      title: "Falha ao editar Avaliador 😿",
+      title: "Falha ao editar avaliador 😿",
       text: error.response.data.message || "",
     })
     throw error;
