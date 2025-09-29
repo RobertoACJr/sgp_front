@@ -14,7 +14,7 @@
           height="350px"
           cover
         >
-          {{ getCurrentEvent.text }}
+          {{ getCurrentEvent.description }}
         </v-img>
       </div>
 
@@ -96,7 +96,7 @@ export default defineComponent({
     getEventPermissions() {
       this.loading = true
       eventsService.saveEventPermission({
-        event_uuid: this.getCurrentEvent.value,
+        event_uuid: this.getCurrentEvent.uuid,
       })
         .then(() => {
           this.handlePermissions()

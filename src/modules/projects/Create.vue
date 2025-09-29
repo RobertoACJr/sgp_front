@@ -408,7 +408,7 @@ export default {
         institution: this.state.institution,
         students_name: this.state.studentsNames,
         advisor_professor: this.state.advisorProfessor,
-        event_uuid: this.getCurrentEvent.value,
+        event_uuid: this.getCurrentEvent.uuid,
         knowledge_area_id: this.state.knowledgeArea,
         project_category_id: this.state.category,
         ...(this.getHasCoAdvisorProfessor ? { co_advisor_professor: this.state.coAdvisorProfessor } : {}),

@@ -107,7 +107,7 @@ export default {
     ]),
 
     getCurrentEventName() {
-      return this.getCurrentEvent?.text
+      return this.getCurrentEvent?.description
     }
   },
 
