@@ -222,7 +222,7 @@
             variant="tonal"
             @click="handleSaveProject"
           >
-            Cadastrar
+            {{ isEditing ? `Salvar` : 'Cadastrar' }}
           </v-btn>
         </v-col>
       </v-row>
@@ -302,7 +302,16 @@ export default {
   data: () => ({
     requiredMessage: "O campo é obrigatório",
     loading: false,
-    teachingLevelOptions: ['1', '2'],
+    teachingLevelOptions: [
+      {
+        title: "Ensino Fundamental",
+        value: 1,
+      },
+      {
+        title: "Ensino Médio",
+        value: 2
+      }
+    ],
     categoryOptions: [
       {
         title: "Pesquisa Científica",
