@@ -49,7 +49,7 @@ export const forgottenPasswordGetToken = async payload => {
 export const forgottenPasswordSendToken = async payload => {
   try {
     const { data } = await authApi.forgottenPasswordSendToken(payload);
-    successToast({ title: "Senha auterada com sucesso! 🥳👍" })
+    successToast({ title: "Senha alterada com sucesso! 🥳👍" })
     return data;
   } catch (error) {
     console.error(error);
