@@ -44,9 +44,9 @@ export const create = async params => {
   }
 }
 
-export const update = async config => {
+export const update = async (uuid, params) => {
   try {
-    const { data } = await projectApi.update(config);
+    const { data } = await projectApi.update(uuid, params);
     successToast({ title: "Projeto editado com sucesso! 🥳👍" })
     return data;
   } catch (error) {
