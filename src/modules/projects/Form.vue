@@ -158,7 +158,7 @@
               v-for="(student, index) in state.studentsNames"
               :key="index"
               cols="12"
-              class="d-flex g-4"
+              class="d-flex ga-4"
             >
               <v-text-field
                 v-model="state.studentsNames[index]"
@@ -427,10 +427,10 @@ export default {
       this.state.coAdvisorProfessor.name = this.getCurrentProject?.co_advisor_professor?.name || ""
       this.state.coAdvisorProfessor.email = this.getCurrentProject?.co_advisor_professor?.email || ""
       this.state.institution = this.getCurrentProject?.institution || ""
-      this.state.teachingLevel = this.getCurrentProject?.teaching_level || ""
       this.state.studentsNames = this.getCurrentProject?.students_name || []
-      this.state.knowledgeArea = this.getCurrentProject?.knowledge_area || ""
-      this.state.category = this.getCurrentProject?.category || ""
+      this.state.knowledgeArea = this.getKnowledgeAreasOptions.find(({ title }) => title.includes(this.getCurrentProject?.knowledge_area))?.value || ""
+      this.state.teachingLevel = this.teachingLevelOptions.find(({ title }) => title == this.getCurrentProject?.teaching_level || "")?.value || ""
+      this.state.category = this.categoryOptions.find(({ title }) => title == this.getCurrentProject?.category || "")?.value || ""
     },
 
     getStudentErrorsByIndex(index) {
@@ -481,9 +481,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.g-4 {
-  gap: 16px;
-}
-</style>
