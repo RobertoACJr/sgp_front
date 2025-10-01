@@ -5,7 +5,7 @@
     <div
       class="text-h6 heading-6 mb-5"
     >
-      {{ isEditing ? `Editando: ${getCurrentProject.name}` : 'Cadastro de Projeto' }}
+      {{ isEditing ? `Editando: ${getCurrentProject.title}` : 'Cadastro de Projeto' }}
     </div>
     <loading
       v-if="loading"
