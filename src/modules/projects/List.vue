@@ -15,6 +15,19 @@
           icon
           :disabled="loading"
           class="mr-3"
+          title="Exportar informações para avaliação"
+          @click="exportProjectsBasicInformation"
+        >
+          <v-icon
+            color="primary"
+          >
+            mdi-file-edit-outline
+          </v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          :disabled="loading"
+          class="mr-3"
           title="Exportar Ranking de Projetos"
           @click="exportProjectsRanking"
         >
@@ -152,7 +165,7 @@
                 {{ project.code }}
               </td>
               <td class="text-body-2">
-                {{ project.location ? `${project.location} -` : "" }}{{ project.title }}
+                {{ project.location ? `${project.location} - ` : "" }}{{ project.title }}
               </td>
               <td class="text-body-2 text-center">
                 {{ project.evaluations_quantity || "não avaliado" }}
@@ -297,6 +310,18 @@ export default defineComponent({
           this.loading = false;
           this.setLengthOfPages(response?.meta?.pages || 1);
           this.setFetchProjectsList(false);
+        })
+        .catch(() => {
+          this.loading = false;
+        })
+    },
+    exportProjectsBasicInformation () {
+      this.loading = true;
+      this.loadingText = "Exportando..."
+      exportService.exportProjectsBasicInformation()
+        .then((response) => {
+          response?.data?.url && window.open(response.data.url, '_blank')
+          this.loading = false;
         })
         .catch(() => {
           this.loading = false;
