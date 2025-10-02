@@ -15,6 +15,11 @@ export const list = async params => {
   }
 }
 
+export const getStartedEvaluation = async () => {
+  const { data } = await projectApi.getStartedEvaluation();
+  return data;
+}
+
 export const show = async uuid => {
   try {
     const { data } = await projectApi.show(uuid);

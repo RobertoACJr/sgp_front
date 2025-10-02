@@ -231,12 +231,12 @@
       v-if="!getIsAdmin"
       block
       class="mt-8"
-      color="tertiary"
+      color="primary"
       size="large"
       variant="tonal"
       @click="validateProjectCode"
     >
-      Avaliar Projeto
+      {{ continueEvaluation ? "Continuar" : "Iniciar" }} Avaliação
     </v-btn>
   </v-container>
   <ModalValidateProjectCode
@@ -264,15 +264,25 @@ import * as evaluationsService from '@/modules/evaluations/services/evaluations.
 
 export default defineComponent({
   name: 'ShowProject',
+
   components: {
     ModalValidateProjectCode,
     ModalValidateChangeEvaluationStatus,
   },
+
+  props: {
+    continueEvaluation: {
+      type: Boolean,
+      default: false,
+    }
+  },
+
   data: () => ({
     loading: false,
     isModalValidateCodeOpen: false,
     isModalValidateChangeEvaluationStatusOpen: false,
   }),
+
   computed: {
     ...mapGetters('permissions', [
       'getIsAdmin',
@@ -297,10 +307,12 @@ export default defineComponent({
         !this.getCurrentProject.evaluations.every(a => !a.active);
     }
   },
+
   mounted() {
     this.getFetchProject && this.getProjectInformations();
     this.setFetchProject(true);
   },
+
   methods: {
     ...mapMutations('projects', [
       'setCurrentProject',

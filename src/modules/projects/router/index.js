@@ -19,6 +19,9 @@ export default [
     path: "/projects/info",
     name: "showProject",
     component: Show,
+    props: route => ({
+      continueEvaluation: !!route.query.continueEvaluation
+    }),
     meta: {
       needsAuthentication: true,
       mainModule: "projects",

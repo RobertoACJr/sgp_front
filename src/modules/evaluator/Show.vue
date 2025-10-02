@@ -206,10 +206,7 @@ export default defineComponent({
       this.isModalValidateChangeEvaluatorApprovedStatusOpen = false;
       this.loading = true;
       const payload = this.getPayloadEditEvaluator
-      evaluatorService.update({
-        payload,
-        uuid: this.getCurrentEvaluator.uuid
-      })
+      evaluatorService.update(this.getCurrentEvaluator.uuid, payload)
         .then(() => {
           this.getEvaluatorInformations();
           this.setFetchEvaluatorsList(true);

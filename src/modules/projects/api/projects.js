@@ -4,6 +4,10 @@ export const list = async (params) => {
   return axios.get('project', { params })
 }
 
+export const getStartedEvaluation = async () => {
+  return axios.get("project/evaluationStarted")
+}
+
 export const show = async (uuid) => {
   return axios.get(`project/${uuid}`,)
 }
