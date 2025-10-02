@@ -203,6 +203,28 @@
         />
       </v-col>
     </v-row>
+
+    <v-row v-if="hasStartedEvaluation">
+      <v-col
+        cols="12"
+      >
+        <div
+          class="text-h6 heading-6 mt-5"
+        >
+          Avaliação em andamento
+        </div>
+      </v-col>
+      <v-col
+        cols="12"
+        md="4"
+        sm="6"
+      >
+        <CardProject
+          :project-title="`${projectBeingEvaluated.location ? projectBeingEvaluated.location + ' - ' : ''}${projectBeingEvaluated.title}`"
+          @click="continueEvaluation(projectBeingEvaluated)"
+        />
+      </v-col>
+    </v-row>
   </v-container>
   <ModalFilters
     :is-open="isFiltersModalOpen"
@@ -228,10 +250,11 @@ export default defineComponent({
     ModalFilters,
   },
   data: () => ({
-    loading: false,
     loadingText: "",
-    filters: [],
+    loading: false,
     isFiltersModalOpen: false,
+    projectBeingEvaluated: {},
+    filters: [],
   }),
   computed: {
     ...mapGetters('permissions', [
@@ -268,14 +291,23 @@ export default defineComponent({
           this.projectHasFilteredTeachingLevel(project.teaching_level)
       })
     },
+    hasStartedEvaluation() {
+      return this.projectBeingEvaluated && !!Object.keys(this.projectBeingEvaluated)?.length
+    }
   },
-  mounted() {
+  async mounted() {
+    if (!this.getIsAdmin) {
+      await this.getStartedEvaluation();
+    }
+
     this.getFetchProjectsList && this.getProjectsByPage();
+
     this.filters = [
       ...this.getCategoryFilter ? this.getCategoryFilter.map(f => ({ title: f, type: 'category' })) : [],
       ...this.getTeachingLevelFilter ? this.getTeachingLevelFilter.map(f => ({ title: f, type: 'teaching_level' })) : [],
       ...this.getKnowledgeAreaFilter ? this.getKnowledgeAreaFilter.map(f => ({ title: f, type: 'knowledge_area' })) : [],
     ]
+
     this.setFetchProject(true);
   },
   methods: {
@@ -290,11 +322,26 @@ export default defineComponent({
       'setTeachingLevelFilter',
       'setKnowledgeAreaFilter',
     ]),
+
     goToProject (project) {
       this.setCurrentProject(project);
       this.$router.push({ name: 'showProject' });
     },
-    getProjectsByPage () {
+
+    continueEvaluation (project) {
+      this.setCurrentProject(project);
+      this.$router.push({ name: 'showProject',  query: { continueEvaluation: true } });
+    },
+
+    getStartedEvaluation() {
+      projectService.getStartedEvaluation()
+        .then(({ data }) => {
+          const project = data[0]
+          this.projectBeingEvaluated = project || {}
+        })
+    },
+
+    getProjectsByPage() {
       this.loading = true;
       this.loadingText = "Buscando projetos..."
       let params = {};
@@ -315,7 +362,8 @@ export default defineComponent({
           this.loading = false;
         })
     },
-    exportProjectsBasicInformation () {
+
+    exportProjectsBasicInformation() {
       this.loading = true;
       this.loadingText = "Exportando..."
       exportService.exportProjectsBasicInformation()
@@ -327,7 +375,8 @@ export default defineComponent({
           this.loading = false;
         })
     },
-    exportProjectsRanking () {
+
+    exportProjectsRanking() {
       this.loading = true;
       this.loadingText = "Exportando..."
       exportService.exportProjectsRanking()
@@ -339,7 +388,8 @@ export default defineComponent({
           this.loading = false;
         })
     },
-    exportEvaluators () {
+
+    exportEvaluators() {
       this.loading = true;
       this.loadingText = "Exportando"
       exportService.exportEvaluators()
@@ -351,17 +401,21 @@ export default defineComponent({
           this.loading = false;
         })
     },
-    projectHasFilteredCategory (category) {
+
+    projectHasFilteredCategory(category) {
       return !this.getCategoryFilter || !this.getCategoryFilter.length || this.getCategoryFilter.includes(category);
     },
-    projectHasFilteredTeachingLevel (teachingLevel) {
+
+    projectHasFilteredTeachingLevel(teachingLevel) {
       return !this.getTeachingLevelFilter || !this.getTeachingLevelFilter.length || this.getTeachingLevelFilter.includes(teachingLevel);
     },
-    projectHasFilteredKnoledgeArea (knowledgeArea) {
+
+    projectHasFilteredKnoledgeArea(knowledgeArea) {
       return !this.getKnowledgeAreaFilter ||
         !this.getKnowledgeAreaFilter.length ||
         this.getKnowledgeAreaFilter.find(f => f.includes(knowledgeArea));
     },
+
     removeFilter(filter) {
       if (filter.type == 'category') {
         this.setCategoryFilter(this.getCategoryFilter.filter(f => f != filter.title));
